@@ -135,11 +135,29 @@ const SeoOptimization = () => {
                   <div>
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-sm font-medium">Readability</span>
-                      <span className={`text-lg font-semibold ${getScoreColor(analysis.readability || 0)}`}>
-                        {analysis.readability || 0}/100
+                      <span className={`text-lg font-semibold ${getScoreColor(
+                        typeof analysis.readability === 'object' 
+                          ? analysis.readability?.fleschReadingEase || 0 
+                          : analysis.readability || 0
+                      )}`}>
+                        {typeof analysis.readability === 'object' 
+                          ? `${analysis.readability?.fleschReadingEase || 0}/100` 
+                          : `${analysis.readability || 0}/100`}
                       </span>
                     </div>
-                    <Progress value={analysis.readability || 0} className="h-2" />
+                    <Progress 
+                      value={
+                        typeof analysis.readability === 'object' 
+                          ? analysis.readability?.fleschReadingEase || 0 
+                          : analysis.readability || 0
+                      } 
+                      className="h-2" 
+                    />
+                    {typeof analysis.readability === 'object' && analysis.readability?.gradeLevel && (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Grade Level: {analysis.readability.gradeLevel}
+                      </p>
+                    )}
                   </div>
 
                   {analysis.metaDescription && (
