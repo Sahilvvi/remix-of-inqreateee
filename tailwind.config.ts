@@ -81,8 +81,9 @@ export default {
           },
         },
         "float": {
-          "0%, 100%": { transform: "translateY(0px)" },
-          "50%": { transform: "translateY(-20px)" },
+          "0%, 100%": { transform: "translateY(0px) rotate(0deg)" },
+          "33%": { transform: "translateY(-20px) rotate(2deg)" },
+          "66%": { transform: "translateY(-10px) rotate(-2deg)" },
         },
         "glow": {
           "0%": { boxShadow: "0 0 20px hsl(var(--primary) / 0.3)" },
@@ -96,14 +97,50 @@ export default {
           "0%": { opacity: "0", transform: "translateY(10px)" },
           "100%": { opacity: "1", transform: "translateY(0)" },
         },
+        "pulse-slow": {
+          "0%, 100%": { opacity: "1", transform: "scale(1)" },
+          "50%": { opacity: "0.8", transform: "scale(1.05)" },
+        },
+        "shine": {
+          "0%": { left: "-100%" },
+          "50%, 100%": { left: "100%" },
+        },
+        "gradient-shift": {
+          "0%, 100%": { backgroundPosition: "0% 50%" },
+          "50%": { backgroundPosition: "100% 50%" },
+        },
+        "bounce-subtle": {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-10px)" },
+        },
+        "scale-in": {
+          "0%": { transform: "scale(0.9)", opacity: "0" },
+          "100%": { transform: "scale(1)", opacity: "1" },
+        },
+        "slide-up": {
+          "0%": { transform: "translateY(30px)", opacity: "0" },
+          "100%": { transform: "translateY(0)", opacity: "1" },
+        },
+        "rotate-gradient": {
+          "0%": { transform: "rotate(0deg)" },
+          "100%": { transform: "rotate(360deg)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "float": "float 6s ease-in-out infinite",
+        "float-delay": "float 6s ease-in-out infinite 2s",
         "glow": "glow 2s ease-in-out infinite alternate",
         "slide-in": "slide-in 0.5s ease-out",
         "fade-in": "fade-in 0.6s ease-out",
+        "pulse-slow": "pulse-slow 3s ease-in-out infinite",
+        "shine": "shine 3s infinite",
+        "gradient-shift": "gradient-shift 8s ease infinite",
+        "bounce-subtle": "bounce-subtle 2s ease-in-out infinite",
+        "scale-in": "scale-in 0.5s ease-out",
+        "slide-up": "slide-up 0.6s ease-out",
+        "rotate-gradient": "rotate-gradient 20s linear infinite",
       },
     },
   },

@@ -42,11 +42,18 @@ const Services = () => {
   ];
 
   return (
-    <section id="services" className="py-20">
-      <div className="container mx-auto px-6">
-        <div className="text-center mb-16 animate-fade-in">
-          <h2 className="text-4xl font-bold mb-4">Our Services</h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+    <section id="services" className="relative py-20 overflow-hidden">
+      {/* Animated background */}
+      <div className="absolute inset-0 particle-bg opacity-10"></div>
+      <div className="absolute top-1/4 right-0 w-96 h-96 bg-accent rounded-full blur-3xl opacity-10 animate-float"></div>
+      <div className="absolute bottom-1/4 left-0 w-96 h-96 bg-primary rounded-full blur-3xl opacity-10 animate-float-delay"></div>
+
+      <div className="container mx-auto px-6 relative z-10">
+        <div className="text-center mb-16 animate-slide-up">
+          <h2 className="text-5xl md:text-6xl font-bold mb-6">
+            Our <span className="gradient-text neon-text">Services</span>
+          </h2>
+          <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto">
             Comprehensive AI-powered tools to automate your entire digital workflow
           </p>
         </div>
@@ -55,13 +62,19 @@ const Services = () => {
           {services.map((service, index) => (
             <Card
               key={index}
-              className="p-6 hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 group glass-effect"
+              className="p-8 glass-card hover-lift cursor-pointer animate-scale-in group border-2 border-transparent hover-glow relative overflow-hidden"
+              style={{ animationDelay: `${index * 0.1}s` }}
             >
-              <div className={`inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br ${service.color} mb-4 group-hover:scale-110 transition-transform`}>
-                <service.icon className="w-7 h-7 text-white" />
+              {/* Animated shine effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+              
+              <div className="relative z-10">
+                <div className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br ${service.color} mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg animate-glow`}>
+                  <service.icon className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="text-2xl font-bold mb-4 gradient-text">{service.title}</h3>
+                <p className="text-muted-foreground text-lg">{service.description}</p>
               </div>
-              <h3 className="text-xl font-bold mb-3">{service.title}</h3>
-              <p className="text-muted-foreground">{service.description}</p>
             </Card>
           ))}
         </div>

@@ -21,11 +21,18 @@ const About = () => {
   ];
 
   return (
-    <section id="about" className="py-20 bg-muted/30">
-      <div className="container mx-auto px-6">
-        <div className="text-center mb-16 animate-fade-in">
-          <h2 className="text-4xl font-bold mb-4">What We Do</h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+    <section id="about" className="relative py-20 overflow-hidden">
+      {/* Background effects */}
+      <div className="absolute inset-0 bg-gradient-to-b from-background via-muted/20 to-background"></div>
+      <div className="absolute top-0 left-1/3 w-96 h-96 bg-primary rounded-full blur-3xl opacity-10 animate-pulse-slow"></div>
+      <div className="absolute bottom-0 right-1/3 w-96 h-96 bg-secondary rounded-full blur-3xl opacity-10 animate-pulse-slow"></div>
+
+      <div className="container mx-auto px-6 relative z-10">
+        <div className="text-center mb-16 animate-slide-up">
+          <h2 className="text-5xl md:text-6xl font-bold mb-6">
+            What <span className="gradient-text neon-text">We Do</span>
+          </h2>
+          <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto">
             AI Block Automation is your all-in-one platform for automating content creation, SEO optimization,
             and digital workflow management using advanced AI technology.
           </p>
@@ -35,13 +42,19 @@ const About = () => {
           {features.map((feature, index) => (
             <Card
               key={index}
-              className="p-8 text-center hover:shadow-xl transition-all duration-300 hover:-translate-y-2 glass-effect"
+              className="p-8 text-center glass-card hover-lift cursor-pointer animate-scale-in group border-2 border-transparent hover-glow relative overflow-hidden"
+              style={{ animationDelay: `${index * 0.1}s` }}
             >
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-6">
-                <feature.icon className="w-8 h-8 text-primary" />
+              {/* Animated gradient background on hover */}
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-secondary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              
+              <div className="relative z-10">
+                <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-primary to-secondary mb-6 animate-glow group-hover:scale-110 transition-transform duration-300">
+                  <feature.icon className="w-10 h-10 text-primary-foreground" />
+                </div>
+                <h3 className="text-2xl font-bold mb-3 gradient-text">{feature.title}</h3>
+                <p className="text-muted-foreground text-lg">{feature.description}</p>
               </div>
-              <h3 className="text-xl font-bold mb-3">{feature.title}</h3>
-              <p className="text-muted-foreground">{feature.description}</p>
             </Card>
           ))}
         </div>
