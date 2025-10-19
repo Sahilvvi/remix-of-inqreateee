@@ -3,6 +3,8 @@ import { Card } from "@/components/ui/card";
 import { FileText, MessageSquare, TrendingUp, Users, ArrowUpRight, Clock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
+import { UsageOverview } from "./overview/UsageOverview";
+import { QuickPreviews } from "./overview/QuickPreviews";
 
 interface Stats {
   totalBlogs: number;
@@ -13,6 +15,9 @@ interface Stats {
     title: string;
     created_at: string;
   }>;
+  socialPosts: number;
+  seoAnalyses: number;
+  productListings: number;
 }
 
 const Overview = () => {
@@ -22,6 +27,9 @@ const Overview = () => {
     blogsThisWeek: 0,
     totalWords: 0,
     recentBlogs: [],
+    socialPosts: 0,
+    seoAnalyses: 0,
+    productListings: 0,
   });
   const [loading, setLoading] = useState(true);
 
@@ -54,35 +62,49 @@ const Overview = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // Get all blogs for the user
-      const { data: allBlogs, error: blogsError } = await supabase
+      // Fetch blog stats
+      const { data: blogs, error } = await supabase
         .from('generated_blogs')
-        .select('id, title, created_at, word_count')
+        .select('*')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
-      if (blogsError) throw blogsError;
+      if (error) throw error;
 
-      // Calculate stats
-      const totalBlogs = allBlogs?.length || 0;
-      const totalWords = allBlogs?.reduce((sum, blog) => sum + (blog.word_count || 0), 0) || 0;
+      const totalBlogs = blogs?.length || 0;
+      const totalWords = blogs?.reduce((sum, blog) => sum + (blog.word_count || 0), 0) || 0;
       
-      // Get blogs from this week
       const oneWeekAgo = new Date();
       oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-      const blogsThisWeek = allBlogs?.filter(blog => 
+      const blogsThisWeek = blogs?.filter(blog => 
         new Date(blog.created_at) > oneWeekAgo
       ).length || 0;
 
-      // Get recent blogs for activity
-      const recentBlogs = allBlogs?.slice(0, 4) || [];
+      const recentBlogs = blogs?.slice(0, 5) || [];
 
-      setStats({
+      // Fetch social media posts count
+      const { count: socialCount } = await supabase
+        .from('social_media_posts')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id);
+
+      // Fetch SEO analyses count
+      const { count: seoCount } = await supabase
+        .from('seo_analyses')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id);
+
+      const newStats: Stats = {
         totalBlogs,
         blogsThisWeek,
         totalWords,
         recentBlogs,
-      });
+        socialPosts: socialCount || 0,
+        seoAnalyses: seoCount || 0,
+        productListings: 0, // This would come from e-commerce data when available
+      };
+
+      setStats(newStats);
     } catch (error) {
       console.error('Error fetching stats:', error);
     } finally {
@@ -156,6 +178,21 @@ const Overview = () => {
             </Card>
           );
         })}
+      </div>
+
+      {/* Usage Overview and Quick Previews */}
+      <div className="grid lg:grid-cols-2 gap-6">
+        <UsageOverview
+          blogsGenerated={stats.totalBlogs}
+          socialPosts={stats.socialPosts}
+          seoAnalyses={stats.seoAnalyses}
+          productListings={stats.productListings}
+        />
+        <QuickPreviews
+          onNavigate={(route) => {
+            window.dispatchEvent(new CustomEvent('dashboard-navigate', { detail: route }));
+          }}
+        />
       </div>
 
       <div className="grid md:grid-cols-2 gap-6">
