@@ -8,7 +8,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Copy, Download, Image as ImageIcon, FileText } from "lucide-react";
+import { Loader2, Copy, Download, Image as ImageIcon, FileText, History, BarChart3 } from "lucide-react";
+import { PostPreview } from "./social/PostPreview";
+import { SocialHistory } from "./social/SocialHistory";
+import { PerformanceMetrics } from "./social/PerformanceMetrics";
 
 const SocialMediaGenerator = () => {
   const [platform, setPlatform] = useState("instagram");
@@ -44,6 +47,20 @@ const SocialMediaGenerator = () => {
       if (error) throw error;
 
       setGeneratedPost(data.post);
+      
+      // Save to history
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        await supabase.from('social_media_posts').insert({
+          user_id: user.id,
+          platform,
+          topic,
+          tone,
+          post_content: data.post,
+          include_hashtags: includeHashtags
+        });
+      }
+      
       toast({
         title: "Success",
         description: "Social media post generated!",
@@ -128,7 +145,7 @@ const SocialMediaGenerator = () => {
       </div>
 
       <Tabs defaultValue="text" className="w-full">
-        <TabsList className="grid w-full max-w-md grid-cols-2">
+        <TabsList className="grid w-full max-w-2xl grid-cols-4">
           <TabsTrigger value="text" className="flex items-center gap-2">
             <FileText className="h-4 w-4" />
             Text Post
@@ -137,10 +154,18 @@ const SocialMediaGenerator = () => {
             <ImageIcon className="h-4 w-4" />
             Image
           </TabsTrigger>
+          <TabsTrigger value="history" className="flex items-center gap-2">
+            <History className="h-4 w-4" />
+            History
+          </TabsTrigger>
+          <TabsTrigger value="performance" className="flex items-center gap-2">
+            <BarChart3 className="h-4 w-4" />
+            Performance
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="text" className="mt-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <Card className="glass-effect">
               <CardHeader>
                 <CardTitle>Post Settings</CardTitle>
@@ -244,6 +269,12 @@ const SocialMediaGenerator = () => {
             )}
           </CardContent>
         </Card>
+
+        <PostPreview 
+          platform={platform}
+          content={generatedPost}
+          imageUrl={generatedImage}
+        />
           </div>
         </TabsContent>
 
@@ -334,6 +365,14 @@ const SocialMediaGenerator = () => {
               </CardContent>
             </Card>
           </div>
+        </TabsContent>
+
+        <TabsContent value="history" className="mt-6">
+          <SocialHistory />
+        </TabsContent>
+
+        <TabsContent value="performance" className="mt-6">
+          <PerformanceMetrics />
         </TabsContent>
       </Tabs>
     </div>

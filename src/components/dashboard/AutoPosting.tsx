@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,17 +7,57 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Calendar, Trash2 } from "lucide-react";
+import { Calendar, Trash2, Upload } from "lucide-react";
+
+interface ScheduledPost {
+  id: string;
+  platform: string;
+  content: string;
+  scheduled_time: string;
+  status: string;
+}
 
 const AutoPosting = () => {
   const [platform, setPlatform] = useState("instagram");
   const [content, setContent] = useState("");
   const [scheduledTime, setScheduledTime] = useState("");
-  const [scheduledPosts, setScheduledPosts] = useState([
-    { id: 1, platform: "Instagram", content: "Check out our new product line!", time: "2025-01-20 10:00 AM" },
-    { id: 2, platform: "LinkedIn", content: "Exciting company update...", time: "2025-01-21 2:00 PM" },
-  ]);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [scheduledPosts, setScheduledPosts] = useState<ScheduledPost[]>([]);
   const { toast } = useToast();
+
+  useEffect(() => {
+    fetchScheduledPosts();
+    
+    const channel = supabase
+      .channel('scheduled-posts-changes')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'scheduled_posts'
+      }, () => {
+        fetchScheduledPosts();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
+  const fetchScheduledPosts = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const { data, error } = await supabase
+      .from('scheduled_posts')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('scheduled_time', { ascending: true });
+
+    if (!error && data) {
+      setScheduledPosts(data);
+    }
+  };
 
   const handleSchedule = async () => {
     if (!content.trim() || !scheduledTime) {
@@ -30,22 +70,22 @@ const AutoPosting = () => {
     }
 
     try {
-      const { data, error } = await supabase.functions.invoke('schedule-post', {
-        body: { platform, content, scheduledTime, action: 'schedule' }
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("User not authenticated");
+
+      const { error } = await supabase.from('scheduled_posts').insert({
+        user_id: user.id,
+        platform,
+        content,
+        scheduled_time: scheduledTime,
+        status: 'pending'
       });
 
       if (error) throw error;
 
-      const newPost = {
-        id: Date.now(),
-        platform: platform.charAt(0).toUpperCase() + platform.slice(1),
-        content,
-        time: new Date(scheduledTime).toLocaleString()
-      };
-
-      setScheduledPosts([...scheduledPosts, newPost]);
       setContent("");
       setScheduledTime("");
+      setImageFile(null);
 
       toast({
         title: "Success",
@@ -61,19 +101,26 @@ const AutoPosting = () => {
     }
   };
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: string) => {
     try {
-      await supabase.functions.invoke('schedule-post', {
-        body: { action: 'delete', postId: id }
-      });
+      const { error } = await supabase
+        .from('scheduled_posts')
+        .delete()
+        .eq('id', id);
 
-      setScheduledPosts(scheduledPosts.filter(post => post.id !== id));
+      if (error) throw error;
+
       toast({
         title: "Deleted",
         description: "Scheduled post removed.",
       });
     } catch (error) {
       console.error('Error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete post.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -102,6 +149,9 @@ const AutoPosting = () => {
                   <SelectItem value="twitter">Twitter/X</SelectItem>
                   <SelectItem value="linkedin">LinkedIn</SelectItem>
                   <SelectItem value="facebook">Facebook</SelectItem>
+                  <SelectItem value="tiktok">TikTok</SelectItem>
+                  <SelectItem value="youtube">YouTube</SelectItem>
+                  <SelectItem value="pinterest">Pinterest</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -127,6 +177,21 @@ const AutoPosting = () => {
               />
             </div>
 
+            <div className="space-y-2">
+              <Label htmlFor="image-upload">Attach Image (optional)</Label>
+              <Input
+                id="image-upload"
+                type="file"
+                accept="image/*"
+                onChange={(e) => setImageFile(e.target.files?.[0] || null)}
+              />
+              {imageFile && (
+                <p className="text-sm text-muted-foreground">
+                  Selected: {imageFile.name}
+                </p>
+              )}
+            </div>
+
             <Button onClick={handleSchedule} className="w-full">
               <Calendar className="mr-2 h-4 w-4" />
               Schedule Post
@@ -148,8 +213,17 @@ const AutoPosting = () => {
                 >
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex-1">
-                      <p className="font-semibold text-sm text-primary">{post.platform}</p>
-                      <p className="text-xs text-muted-foreground">{post.time}</p>
+                      <p className="font-semibold text-sm text-primary capitalize">{post.platform}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {new Date(post.scheduled_time).toLocaleString()}
+                      </p>
+                      <span className={`text-xs px-2 py-1 rounded-full ${
+                        post.status === 'posted' ? 'bg-green-500/20 text-green-500' :
+                        post.status === 'failed' ? 'bg-red-500/20 text-red-500' :
+                        'bg-yellow-500/20 text-yellow-500'
+                      }`}>
+                        {post.status}
+                      </span>
                     </div>
                     <Button
                       variant="ghost"

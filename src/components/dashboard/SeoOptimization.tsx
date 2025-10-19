@@ -6,8 +6,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, CheckCircle2, AlertCircle } from "lucide-react";
+import { Loader2, CheckCircle2, AlertCircle, History, FileSearch } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { SeoHistory } from "./seo/SeoHistory";
 
 const SeoOptimization = () => {
   const [content, setContent] = useState("");
@@ -35,6 +37,24 @@ const SeoOptimization = () => {
       if (error) throw error;
 
       setAnalysis(data.analysis);
+      
+      // Save to history
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        await supabase.from('seo_analyses').insert({
+          user_id: user.id,
+          content,
+          target_keywords: targetKeywords,
+          seo_score: data.analysis.score || 0,
+          readability_score: typeof data.analysis.readability === 'object' 
+            ? data.analysis.readability?.fleschReadingEase || 0 
+            : data.analysis.readability || 0,
+          meta_description: data.analysis.metaDescription || '',
+          suggestions: data.analysis.suggestions || [],
+          missing_keywords: data.analysis.missingKeywords || []
+        });
+      }
+      
       toast({
         title: "Success",
         description: "SEO analysis completed!",
@@ -64,6 +84,19 @@ const SeoOptimization = () => {
         <p className="text-muted-foreground">Analyze and improve your content's SEO</p>
       </div>
 
+      <Tabs defaultValue="analyze" className="w-full">
+        <TabsList className="grid w-full max-w-md grid-cols-2">
+          <TabsTrigger value="analyze" className="flex items-center gap-2">
+            <FileSearch className="h-4 w-4" />
+            Analyze
+          </TabsTrigger>
+          <TabsTrigger value="history" className="flex items-center gap-2">
+            <History className="h-4 w-4" />
+            History
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="analyze" className="mt-6">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card className="glass-effect">
           <CardHeader>
@@ -207,6 +240,12 @@ const SeoOptimization = () => {
           </CardContent>
         </Card>
       </div>
+        </TabsContent>
+
+        <TabsContent value="history" className="mt-6">
+          <SeoHistory />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

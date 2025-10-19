@@ -62,6 +62,176 @@ export type Database = {
         }
         Relationships: []
       }
+      post_performance: {
+        Row: {
+          comments: number | null
+          created_at: string
+          engagement_rate: number | null
+          id: string
+          likes: number | null
+          platform: string
+          post_id: string | null
+          posted_at: string | null
+          shares: number | null
+          updated_at: string
+          user_id: string
+          views: number | null
+        }
+        Insert: {
+          comments?: number | null
+          created_at?: string
+          engagement_rate?: number | null
+          id?: string
+          likes?: number | null
+          platform: string
+          post_id?: string | null
+          posted_at?: string | null
+          shares?: number | null
+          updated_at?: string
+          user_id: string
+          views?: number | null
+        }
+        Update: {
+          comments?: number | null
+          created_at?: string
+          engagement_rate?: number | null
+          id?: string
+          likes?: number | null
+          platform?: string
+          post_id?: string | null
+          posted_at?: string | null
+          shares?: number | null
+          updated_at?: string
+          user_id?: string
+          views?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_performance_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "social_media_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      scheduled_posts: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          image_url: string | null
+          platform: string
+          scheduled_time: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          platform: string
+          scheduled_time: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          platform?: string
+          scheduled_time?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      seo_analyses: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          meta_description: string | null
+          missing_keywords: Json | null
+          readability_score: number | null
+          seo_score: number | null
+          suggestions: Json | null
+          target_keywords: string | null
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          meta_description?: string | null
+          missing_keywords?: Json | null
+          readability_score?: number | null
+          seo_score?: number | null
+          suggestions?: Json | null
+          target_keywords?: string | null
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          meta_description?: string | null
+          missing_keywords?: Json | null
+          readability_score?: number | null
+          seo_score?: number | null
+          suggestions?: Json | null
+          target_keywords?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      social_media_posts: {
+        Row: {
+          created_at: string
+          id: string
+          image_prompt: string | null
+          image_url: string | null
+          include_hashtags: boolean | null
+          platform: string
+          post_content: string
+          tone: string
+          topic: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          image_prompt?: string | null
+          image_url?: string | null
+          include_hashtags?: boolean | null
+          platform: string
+          post_content: string
+          tone: string
+          topic: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          image_prompt?: string | null
+          image_url?: string | null
+          include_hashtags?: boolean | null
+          platform?: string
+          post_content?: string
+          tone?: string
+          topic?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       team_invitations: {
         Row: {
           created_at: string
