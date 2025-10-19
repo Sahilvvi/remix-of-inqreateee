@@ -1,9 +1,10 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Copy, Download, Save } from "lucide-react";
+import { Copy, Download, Save, CheckCircle2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
+import { Badge } from "@/components/ui/badge";
 
 interface BlogPreviewProps {
   topic: string;
@@ -94,41 +95,61 @@ export const BlogPreview = ({
 
   if (!content) {
     return (
-      <Card className="p-12 text-center">
-        <p className="text-muted-foreground">Generate content to see preview</p>
+      <Card className="p-16 text-center border-2 border-dashed">
+        <div className="space-y-4">
+          <div className="w-20 h-20 mx-auto rounded-full bg-muted flex items-center justify-center">
+            <CheckCircle2 className="w-10 h-10 text-muted-foreground" />
+          </div>
+          <h3 className="text-xl font-semibold">No Content Yet</h3>
+          <p className="text-muted-foreground max-w-md mx-auto">
+            Generate your blog content to see a beautiful preview here
+          </p>
+        </div>
       </Card>
     );
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex gap-2 justify-end">
-        <Button variant="outline" size="sm" onClick={handleCopy}>
-          <Copy className="w-4 h-4 mr-2" />
+    <div className="space-y-6">
+      {/* Action Buttons */}
+      <div className="flex flex-wrap gap-3 justify-end">
+        <Button variant="outline" size="lg" onClick={handleCopy} className="gap-2">
+          <Copy className="w-4 h-4" />
           Copy
         </Button>
-        <Button variant="outline" size="sm" onClick={handleDownload}>
-          <Download className="w-4 h-4 mr-2" />
+        <Button variant="outline" size="lg" onClick={handleDownload} className="gap-2">
+          <Download className="w-4 h-4" />
           Download
         </Button>
-        <Button size="sm" onClick={handleSave} disabled={saving}>
-          <Save className="w-4 h-4 mr-2" />
+        <Button size="lg" onClick={handleSave} disabled={saving} className="gap-2">
+          <Save className="w-4 h-4" />
           {saving ? "Saving..." : "Save to History"}
         </Button>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>{topic}</CardTitle>
+      {/* Preview Card */}
+      <Card className="border-2 shadow-lg overflow-hidden">
+        <CardHeader className="space-y-4 bg-gradient-to-br from-primary/5 to-primary/10">
+          <div className="flex flex-wrap gap-2">
+            <Badge variant="secondary" className="text-sm">{tone}</Badge>
+            <Badge variant="secondary" className="text-sm">{language}</Badge>
+            <Badge variant="secondary" className="text-sm">{wordCount} words</Badge>
+          </div>
+          <CardTitle className="text-3xl">{topic}</CardTitle>
+          {keywords && (
+            <CardDescription className="text-base">
+              Keywords: {keywords}
+            </CardDescription>
+          )}
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-6 p-8">
           {imageUrl && (
-            <div className="rounded-lg overflow-hidden">
+            <div className="rounded-xl overflow-hidden shadow-xl">
               <img src={imageUrl} alt={topic} className="w-full" />
             </div>
           )}
-          <div className="prose prose-sm max-w-none">
-            <div className="whitespace-pre-wrap">{content}</div>
+          <div className="prose prose-lg max-w-none dark:prose-invert">
+            <div className="whitespace-pre-wrap leading-relaxed">{content}</div>
           </div>
         </CardContent>
       </Card>

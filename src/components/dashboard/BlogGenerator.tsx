@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Sparkles } from "lucide-react";
+import { Sparkles, FileText, Image as ImageIcon, Eye, History, Wand2 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BlogContentForm } from "./blog/BlogContentForm";
 import { BlogImageGenerator } from "./blog/BlogImageGenerator";
@@ -78,91 +78,150 @@ const BlogGenerator = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold mb-2">Premium Blog Generator</h1>
-        <p className="text-muted-foreground">
-          Create professional, SEO-optimized blog posts with AI in multiple languages
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 p-6 space-y-8">
+      {/* Hero Header */}
+      <div className="text-center space-y-4 max-w-3xl mx-auto">
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium">
+          <Wand2 className="w-4 h-4" />
+          AI-Powered Content Studio
+        </div>
+        <h1 className="text-5xl font-bold bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent">
+          Premium Blog Generator
+        </h1>
+        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          Create professional, SEO-optimized blog posts with stunning visuals in multiple languages using advanced AI technology
         </p>
       </div>
 
-      <Tabs defaultValue="generate" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="generate">Generate Content</TabsTrigger>
-          <TabsTrigger value="image">Generate Image</TabsTrigger>
-          <TabsTrigger value="preview">Preview</TabsTrigger>
-          <TabsTrigger value="history">History</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="generate" className="space-y-6">
-          <Card className="p-6 glass-effect">
-            <BlogContentForm
-              topic={topic}
-              setTopic={setTopic}
-              keywords={keywords}
-              setKeywords={setKeywords}
-              tone={tone}
-              setTone={setTone}
-              language={language}
-              setLanguage={setLanguage}
-              wordCount={wordCount}
-              setWordCount={setWordCount}
-              contentStructure={contentStructure}
-              setContentStructure={setContentStructure}
-              targetAudience={targetAudience}
-              setTargetAudience={setTargetAudience}
-            />
-
-            <Button
-              onClick={handleGenerate}
-              disabled={loading}
-              className="w-full mt-6"
-              size="lg"
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto">
+        <Tabs defaultValue="generate" className="w-full">
+          <TabsList className="grid w-full grid-cols-4 h-auto p-1 bg-muted/50 backdrop-blur-sm">
+            <TabsTrigger 
+              value="generate" 
+              className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all"
             >
-              {loading ? (
-                <>Generating Blog Post...</>
-              ) : (
-                <>
-                  <Sparkles className="mr-2 w-5 h-5" />
-                  Generate Blog Post
-                </>
-              )}
-            </Button>
-          </Card>
-        </TabsContent>
+              <FileText className="w-4 h-4" />
+              <span className="hidden sm:inline">Generate Content</span>
+              <span className="sm:hidden">Content</span>
+            </TabsTrigger>
+            <TabsTrigger 
+              value="image"
+              className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all"
+            >
+              <ImageIcon className="w-4 h-4" />
+              <span className="hidden sm:inline">Generate Image</span>
+              <span className="sm:hidden">Image</span>
+            </TabsTrigger>
+            <TabsTrigger 
+              value="preview"
+              className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all"
+            >
+              <Eye className="w-4 h-4" />
+              <span className="hidden sm:inline">Preview</span>
+              <span className="sm:hidden">Preview</span>
+            </TabsTrigger>
+            <TabsTrigger 
+              value="history"
+              className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all"
+            >
+              <History className="w-4 h-4" />
+              <span className="hidden sm:inline">History</span>
+              <span className="sm:hidden">History</span>
+            </TabsTrigger>
+          </TabsList>
 
-        <TabsContent value="image" className="space-y-6">
-          <Card className="p-6 glass-effect">
-            <h3 className="text-xl font-semibold mb-4">Generate Blog Image</h3>
-            <p className="text-muted-foreground mb-6">
-              Create a stunning visual to accompany your blog post
-            </p>
-            <BlogImageGenerator
-              onImageGenerated={handleImageGenerated}
-              currentImageUrl={imageUrl}
-              currentPrompt={imagePrompt}
+          <TabsContent value="generate" className="space-y-6 mt-6">
+            <Card className="border-2 hover:border-primary/50 transition-all duration-300 shadow-lg">
+              <CardHeader className="space-y-1 pb-4">
+                <CardTitle className="text-2xl flex items-center gap-2">
+                  <Sparkles className="w-6 h-6 text-primary" />
+                  Content Generation
+                </CardTitle>
+                <CardDescription>
+                  Configure your blog post parameters for AI generation
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <BlogContentForm
+                  topic={topic}
+                  setTopic={setTopic}
+                  keywords={keywords}
+                  setKeywords={setKeywords}
+                  tone={tone}
+                  setTone={setTone}
+                  language={language}
+                  setLanguage={setLanguage}
+                  wordCount={wordCount}
+                  setWordCount={setWordCount}
+                  contentStructure={contentStructure}
+                  setContentStructure={setContentStructure}
+                  targetAudience={targetAudience}
+                  setTargetAudience={setTargetAudience}
+                />
+
+                <Button
+                  onClick={handleGenerate}
+                  disabled={loading}
+                  className="w-full h-14 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
+                  size="lg"
+                >
+                  {loading ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mr-3" />
+                      Generating Your Blog Post...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="mr-3 w-6 h-6" />
+                      Generate Blog Post
+                    </>
+                  )}
+                </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="image" className="space-y-6 mt-6">
+            <Card className="border-2 hover:border-primary/50 transition-all duration-300 shadow-lg">
+              <CardHeader className="space-y-1 pb-4">
+                <CardTitle className="text-2xl flex items-center gap-2">
+                  <ImageIcon className="w-6 h-6 text-primary" />
+                  Visual Content Generation
+                </CardTitle>
+                <CardDescription>
+                  Create a stunning, custom image to accompany your blog post
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <BlogImageGenerator
+                  onImageGenerated={handleImageGenerated}
+                  currentImageUrl={imageUrl}
+                  currentPrompt={imagePrompt}
+                />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="preview" className="mt-6">
+            <BlogPreview
+              topic={topic}
+              content={generatedBlog}
+              imageUrl={imageUrl}
+              keywords={keywords}
+              tone={tone}
+              language={language}
+              wordCount={wordCount}
+              imagePrompt={imagePrompt}
+              onSaved={handleSaved}
             />
-          </Card>
-        </TabsContent>
+          </TabsContent>
 
-        <TabsContent value="preview" className="space-y-6">
-          <BlogPreview
-            topic={topic}
-            content={generatedBlog}
-            imageUrl={imageUrl}
-            keywords={keywords}
-            tone={tone}
-            language={language}
-            wordCount={wordCount}
-            imagePrompt={imagePrompt}
-            onSaved={handleSaved}
-          />
-        </TabsContent>
-
-        <TabsContent value="history" className="space-y-6">
-          <BlogHistory refreshTrigger={historyRefresh} />
-        </TabsContent>
-      </Tabs>
+          <TabsContent value="history" className="mt-6">
+            <BlogHistory refreshTrigger={historyRefresh} />
+          </TabsContent>
+        </Tabs>
+      </div>
     </div>
   );
 };

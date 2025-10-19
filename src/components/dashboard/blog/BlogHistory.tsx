@@ -3,8 +3,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Trash2, Eye, Download, Copy } from "lucide-react";
+import { Trash2, Eye, Download, Copy, Clock, FileText } from "lucide-react";
 import { format } from "date-fns";
+import { Badge } from "@/components/ui/badge";
 
 interface BlogHistoryProps {
   refreshTrigger?: number;
@@ -94,90 +95,152 @@ export const BlogHistory = ({ refreshTrigger }: BlogHistoryProps) => {
   };
 
   if (loading) {
-    return <div className="text-center p-8">Loading history...</div>;
+    return (
+      <Card className="p-16 text-center">
+        <div className="w-16 h-16 border-4 border-primary/30 border-t-primary rounded-full animate-spin mx-auto" />
+        <p className="mt-4 text-muted-foreground">Loading your blog history...</p>
+      </Card>
+    );
   }
 
   if (blogs.length === 0) {
     return (
-      <Card className="p-12 text-center">
-        <p className="text-muted-foreground">No saved blogs yet. Generate and save your first blog!</p>
+      <Card className="p-16 text-center border-2 border-dashed">
+        <div className="space-y-4">
+          <div className="w-20 h-20 mx-auto rounded-full bg-muted flex items-center justify-center">
+            <FileText className="w-10 h-10 text-muted-foreground" />
+          </div>
+          <h3 className="text-xl font-semibold">No Saved Blogs Yet</h3>
+          <p className="text-muted-foreground max-w-md mx-auto">
+            Generate and save your first blog to start building your content library
+          </p>
+        </div>
       </Card>
     );
   }
 
   return (
-    <div className="grid md:grid-cols-2 gap-6">
+    <div className="grid lg:grid-cols-2 gap-6">
+      {/* Blog List */}
       <div className="space-y-4">
-        <h3 className="font-semibold">Saved Blogs ({blogs.length})</h3>
-        {blogs.map((blog) => (
-          <Card key={blog.id} className={selectedBlog?.id === blog.id ? "border-primary" : ""}>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg">{blog.title}</CardTitle>
-              <CardDescription>
-                {format(new Date(blog.created_at), "PPP")} • {blog.word_count} words • {blog.language}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex gap-2">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => setSelectedBlog(blog)}
-                >
-                  <Eye className="w-4 h-4 mr-2" />
-                  View
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => handleCopy(blog)}
-                >
-                  <Copy className="w-4 h-4 mr-2" />
-                  Copy
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => handleDownload(blog)}
-                >
-                  <Download className="w-4 h-4 mr-2" />
-                  Download
-                </Button>
-                <Button
-                  size="sm"
-                  variant="destructive"
-                  onClick={() => handleDelete(blog.id)}
-                >
-                  <Trash2 className="w-4 h-4" />
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-xl font-semibold">Your Blogs</h3>
+          <Badge variant="secondary" className="text-sm">{blogs.length} saved</Badge>
+        </div>
+        
+        <div className="space-y-3 max-h-[800px] overflow-y-auto pr-2">
+          {blogs.map((blog) => (
+            <Card 
+              key={blog.id} 
+              className={`cursor-pointer transition-all hover:shadow-md ${
+                selectedBlog?.id === blog.id ? "border-2 border-primary shadow-lg" : "border-2"
+              }`}
+              onClick={() => setSelectedBlog(blog)}
+            >
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg line-clamp-2">{blog.title}</CardTitle>
+                <CardDescription className="flex items-center gap-2 text-sm">
+                  <Clock className="w-3 h-3" />
+                  {format(new Date(blog.created_at), "PPP")}
+                </CardDescription>
+                <div className="flex flex-wrap gap-2 pt-2">
+                  <Badge variant="outline" className="text-xs">{blog.tone}</Badge>
+                  <Badge variant="outline" className="text-xs">{blog.language}</Badge>
+                  <Badge variant="outline" className="text-xs">{blog.word_count} words</Badge>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedBlog(blog);
+                    }}
+                    className="gap-1"
+                  >
+                    <Eye className="w-3 h-3" />
+                    View
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleCopy(blog);
+                    }}
+                    className="gap-1"
+                  >
+                    <Copy className="w-3 h-3" />
+                    Copy
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDownload(blog);
+                    }}
+                    className="gap-1"
+                  >
+                    <Download className="w-3 h-3" />
+                    Download
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(blog.id);
+                    }}
+                    className="gap-1"
+                  >
+                    <Trash2 className="w-3 h-3" />
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </div>
 
-      <div>
+      {/* Blog Preview */}
+      <div className="lg:sticky lg:top-6 lg:self-start">
         {selectedBlog ? (
-          <Card>
-            <CardHeader>
-              <CardTitle>{selectedBlog.title}</CardTitle>
-              <CardDescription>
-                {selectedBlog.tone} • {selectedBlog.language} • {selectedBlog.word_count} words
-                {selectedBlog.keywords && ` • Keywords: ${selectedBlog.keywords}`}
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {selectedBlog.image_url && (
-                <img src={selectedBlog.image_url} alt={selectedBlog.title} className="w-full rounded-lg" />
+          <Card className="border-2 shadow-lg">
+            <CardHeader className="space-y-3 bg-gradient-to-br from-primary/5 to-primary/10">
+              <CardTitle className="text-2xl">{selectedBlog.title}</CardTitle>
+              <div className="flex flex-wrap gap-2">
+                <Badge>{selectedBlog.tone}</Badge>
+                <Badge>{selectedBlog.language}</Badge>
+                <Badge>{selectedBlog.word_count} words</Badge>
+              </div>
+              {selectedBlog.keywords && (
+                <CardDescription className="text-sm">
+                  Keywords: {selectedBlog.keywords}
+                </CardDescription>
               )}
-              <div className="prose prose-sm max-w-none">
+            </CardHeader>
+            <CardContent className="space-y-4 p-6 max-h-[700px] overflow-y-auto">
+              {selectedBlog.image_url && (
+                <img 
+                  src={selectedBlog.image_url} 
+                  alt={selectedBlog.title} 
+                  className="w-full rounded-lg shadow-md" 
+                />
+              )}
+              <div className="prose prose-sm max-w-none dark:prose-invert">
                 <div className="whitespace-pre-wrap">{selectedBlog.content}</div>
               </div>
             </CardContent>
           </Card>
         ) : (
-          <Card className="p-12 text-center">
-            <p className="text-muted-foreground">Select a blog to view details</p>
+          <Card className="p-16 text-center border-2 border-dashed">
+            <div className="w-16 h-16 mx-auto rounded-full bg-muted flex items-center justify-center">
+              <Eye className="w-8 h-8 text-muted-foreground" />
+            </div>
+            <p className="mt-4 text-muted-foreground">Select a blog to view details</p>
           </Card>
         )}
       </div>
