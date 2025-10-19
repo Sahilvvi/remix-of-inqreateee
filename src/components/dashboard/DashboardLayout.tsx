@@ -81,7 +81,7 @@ const DashboardLayout = ({ children, activeRoute, onRouteChange }: DashboardLayo
       <aside className="fixed left-0 top-0 bottom-0 w-64 bg-card border-r p-6 overflow-y-auto">
         <div className="flex items-center gap-2 mb-8">
           <Sparkles className="w-6 h-6 text-primary" />
-          <span className="font-bold gradient-text">AI Automation</span>
+          <span className="font-bold gradient-text text-xl">Inqreate</span>
         </div>
 
         <nav className="space-y-2">
