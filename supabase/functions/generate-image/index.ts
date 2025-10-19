@@ -58,10 +58,21 @@ serve(async (req) => {
     }
 
     const data = await response.json();
-    const imageUrl = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
-
-    if (!imageUrl) {
+    console.log('AI Response:', JSON.stringify(data, null, 2));
+    
+    // Extract image from response - Lovable AI returns base64 encoded images
+    const images = data.choices?.[0]?.message?.images;
+    
+    if (!images || images.length === 0) {
+      console.error('No images in response:', data);
       throw new Error('No image generated');
+    }
+    
+    const imageUrl = images[0]?.image_url?.url;
+    
+    if (!imageUrl) {
+      console.error('No image URL found in response:', images);
+      throw new Error('No image URL in response');
     }
 
     console.log('Image generated successfully');
