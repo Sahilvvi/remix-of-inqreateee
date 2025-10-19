@@ -2,6 +2,12 @@ import { useState } from "react";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import Overview from "@/components/dashboard/Overview";
 import BlogGenerator from "@/components/dashboard/BlogGenerator";
+import SocialMediaGenerator from "@/components/dashboard/SocialMediaGenerator";
+import AutoPosting from "@/components/dashboard/AutoPosting";
+import SeoOptimization from "@/components/dashboard/SeoOptimization";
+import BrandTemplates from "@/components/dashboard/BrandTemplates";
+import EcommerceGenerator from "@/components/dashboard/EcommerceGenerator";
+import Analytics from "@/components/dashboard/Analytics";
 import { Card } from "@/components/ui/card";
 
 const Dashboard = () => {
@@ -13,6 +19,18 @@ const Dashboard = () => {
         return <Overview />;
       case "blog":
         return <BlogGenerator />;
+      case "social":
+        return <SocialMediaGenerator />;
+      case "posting":
+        return <AutoPosting />;
+      case "seo":
+        return <SeoOptimization />;
+      case "templates":
+        return <BrandTemplates />;
+      case "ecommerce":
+        return <EcommerceGenerator />;
+      case "analytics":
+        return <Analytics />;
       default:
         return (
           <Card className="p-12 text-center glass-effect">
