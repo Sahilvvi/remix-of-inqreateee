@@ -20,18 +20,32 @@ const AutoPosting = () => {
   const [imagePreview, setImagePreview] = useState("");
   const [scheduledPosts, setScheduledPosts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [socialAccounts, setSocialAccounts] = useState<any>({
-    instagram: false,
-    facebook: false,
-    twitter: false,
-    linkedin: false,
-    youtube: false,
-  });
+  const [connectedAccounts, setConnectedAccounts] = useState<any[]>([]);
+  const [isConnecting, setIsConnecting] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
     fetchScheduledPosts();
+    fetchConnectedAccounts();
   }, []);
+
+  const fetchConnectedAccounts = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from('social_accounts')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('is_active', true);
+
+      if (error) throw error;
+      setConnectedAccounts(data || []);
+    } catch (error) {
+      console.error('Error fetching connected accounts:', error);
+    }
+  };
 
   const fetchScheduledPosts = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -290,7 +304,7 @@ const AutoPosting = () => {
           </Card>
         </TabsContent>
 
-        <TabsContent value="connect" className="mt-6">
+        <TabsContent value="connect" className="mt-6 space-y-4">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -302,26 +316,101 @@ const AutoPosting = () => {
             <CardContent className="space-y-4">
               {Object.keys(platformIcons).map((key) => {
                 const Icon = platformIcons[key];
+                const isConnected = connectedAccounts.find(acc => acc.platform === key);
                 return (
                   <div key={key} className="flex items-center justify-between p-4 rounded-lg border bg-card/50">
                     <div className="flex items-center gap-3">
-                      <Icon className="w-6 h-6 text-primary" />
+                      <div className={`w-10 h-10 ${isConnected ? 'bg-green-500/10' : 'bg-primary/10'} rounded-full flex items-center justify-center`}>
+                        <Icon className="w-5 h-5" />
+                      </div>
                       <div>
                         <p className="font-medium capitalize">{key}</p>
                         <p className="text-sm text-muted-foreground">
-                          {socialAccounts[key] ? "Connected" : "Not connected"}
+                          {isConnected ? `Connected as ${isConnected.account_name || 'User'}` : 'Not connected'}
                         </p>
                       </div>
                     </div>
-                    <Switch
-                      checked={socialAccounts[key]}
-                      onCheckedChange={(checked) =>
-                        setSocialAccounts({ ...socialAccounts, [key]: checked })
-                      }
-                    />
+                    {isConnected ? (
+                      <Button 
+                        variant="destructive" 
+                        size="sm"
+                        onClick={async () => {
+                          try {
+                            const { error } = await supabase
+                              .from('social_accounts')
+                              .delete()
+                              .eq('id', isConnected.id);
+                            
+                            if (error) throw error;
+                            toast({ title: "Account disconnected successfully" });
+                            fetchConnectedAccounts();
+                          } catch (error) {
+                            toast({ 
+                              title: "Error disconnecting account",
+                              variant: "destructive"
+                            });
+                          }
+                        }}
+                      >
+                        Disconnect
+                      </Button>
+                    ) : (
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        disabled={isConnecting}
+                        onClick={() => {
+                          toast({
+                            title: "OAuth Setup Required",
+                            description: `To connect ${key}, you need to provide API credentials. See instructions below.`
+                          });
+                        }}
+                      >
+                        Connect
+                      </Button>
+                    )}
                   </div>
                 );
               })}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>API Credentials Required</CardTitle>
+              <CardDescription>To enable real-time posting, you'll need API credentials from each platform</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4 text-sm">
+              <div className="space-y-2">
+                <h4 className="font-semibold">Twitter/X:</h4>
+                <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+                  <li>TWITTER_CONSUMER_KEY (API Key)</li>
+                  <li>TWITTER_CONSUMER_SECRET (API Secret)</li>
+                  <li>TWITTER_ACCESS_TOKEN</li>
+                  <li>TWITTER_ACCESS_TOKEN_SECRET</li>
+                  <li>Get them at: developer.twitter.com</li>
+                </ul>
+              </div>
+              
+              <div className="space-y-2">
+                <h4 className="font-semibold">Facebook/Instagram:</h4>
+                <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+                  <li>FACEBOOK_APP_ID</li>
+                  <li>FACEBOOK_APP_SECRET</li>
+                  <li>FACEBOOK_ACCESS_TOKEN</li>
+                  <li>Get them at: developers.facebook.com</li>
+                </ul>
+              </div>
+
+              <div className="space-y-2">
+                <h4 className="font-semibold">LinkedIn:</h4>
+                <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+                  <li>LINKEDIN_CLIENT_ID</li>
+                  <li>LINKEDIN_CLIENT_SECRET</li>
+                  <li>LINKEDIN_ACCESS_TOKEN</li>
+                  <li>Get them at: developer.linkedin.com</li>
+                </ul>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
