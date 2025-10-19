@@ -1,22 +1,22 @@
 import Navbar from "@/components/landing/Navbar";
 import Hero from "@/components/landing/Hero";
-import About from "@/components/landing/About";
-import Services from "@/components/landing/Services";
-import AutomationVisualization from "@/components/landing/AutomationVisualization";
+import FeaturesGrid from "@/components/landing/FeaturesGrid";
+import HowItWorks from "@/components/landing/HowItWorks";
 import Testimonials from "@/components/landing/Testimonials";
-import Subscribe from "@/components/landing/Subscribe";
+import Pricing from "@/components/landing/Pricing";
+import CTASection from "@/components/landing/CTASection";
 import Footer from "@/components/landing/Footer";
 
 const Landing = () => {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-[#0D0D0D]">
       <Navbar />
       <Hero />
-      <About />
-      <Services />
-      <AutomationVisualization />
+      <FeaturesGrid />
+      <HowItWorks />
       <Testimonials />
-      <Subscribe />
+      <Pricing />
+      <CTASection />
       <Footer />
     </div>
   );

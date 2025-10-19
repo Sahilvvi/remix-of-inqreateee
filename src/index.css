@@ -8,93 +8,94 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 47% 11%;
+    --background: 210 11% 5%; /* #0D0D0D - Dark Base */
+    --foreground: 0 0% 100%; /* #FFFFFF - White */
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 47% 11%;
+    --card: 0 0% 10%; /* #1A1A1A - Dark Gray for cards */
+    --card-foreground: 0 0% 100%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 47% 11%;
+    --popover: 0 0% 10%;
+    --popover-foreground: 0 0% 100%;
 
-    --primary: 244 63% 58%;
+    --primary: 217 91% 60%; /* #3B82F6 - Neon Blue */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 270 60% 64%;
+    --secondary: 271 81% 56%; /* #9333EA - Purple Glow */
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 240 5% 96%;
-    --muted-foreground: 240 4% 46%;
-
-    --accent: 244 63% 58%;
+    --accent: 328 86% 70%; /* #EC4899 - Hot Pink */
     --accent-foreground: 0 0% 100%;
+
+    --muted: 210 11% 17%; /* #2D2D2D - Divider */
+    --muted-foreground: 220 9% 66%; /* #9CA3AF - Light Gray */
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 240 6% 90%;
-    --input: 240 6% 90%;
-    --ring: 244 63% 58%;
+    --border: 210 11% 17%; /* #2D2D2D */
+    --input: 210 11% 17%;
+    --ring: 217 91% 60%;
 
-    --radius: 0.75rem;
+    --radius: 1rem;
 
-    --gradient-primary: linear-gradient(135deg, hsl(244 63% 58%), hsl(270 60% 64%));
-    --gradient-secondary: linear-gradient(135deg, hsl(190 100% 50%), hsl(244 63% 58%));
-    --gradient-hero: linear-gradient(180deg, hsl(0 0% 100%), hsl(244 63% 98%));
-    --gradient-mesh: radial-gradient(at 27% 37%, hsl(244 63% 58%) 0px, transparent 50%), radial-gradient(at 97% 21%, hsl(270 60% 64%) 0px, transparent 50%), radial-gradient(at 52% 99%, hsl(190 100% 50%) 0px, transparent 50%);
-    --gradient-shine: linear-gradient(90deg, transparent, hsla(0, 0%, 100%, 0.1), transparent);
-    --shadow-glass: 0 8px 32px 0 hsla(244, 63%, 58%, 0.1);
-    --shadow-hover: 0 20px 40px -12px hsla(244, 63%, 58%, 0.25);
-    --shadow-glow: 0 0 60px hsla(244, 63%, 58%, 0.4);
-    --shadow-neon: 0 0 20px hsla(244, 63%, 58%, 0.5), 0 0 40px hsla(270, 60%, 64%, 0.3);
+    /* Inqreate Gradients */
+    --gradient-primary: linear-gradient(135deg, #3B82F6, #9333EA, #EC4899); /* Blue → Purple → Pink */
+    --gradient-secondary: linear-gradient(135deg, #06B6D4, #14F5E1, #A78BFA); /* Cyan → Turquoise → Light Purple */
+    --gradient-glass: linear-gradient(135deg, rgba(96, 165, 250, 0.1), rgba(244, 114, 182, 0.1), rgba(192, 132, 252, 0.1)); /* Glassmorphism */
+    --gradient-hero: radial-gradient(at 27% 37%, #3B82F6 0px, transparent 50%), radial-gradient(at 97% 21%, #9333EA 0px, transparent 50%), radial-gradient(at 52% 99%, #EC4899 0px, transparent 50%);
+    
+    --shadow-glass: 0 8px 32px 0 rgba(59, 130, 246, 0.15);
+    --shadow-hover: 0 20px 40px -12px rgba(147, 51, 234, 0.3);
+    --shadow-glow: 0 0 60px rgba(236, 72, 153, 0.4);
+    --shadow-neon: 0 0 20px rgba(59, 130, 246, 0.5), 0 0 40px rgba(147, 51, 234, 0.3), 0 0 60px rgba(236, 72, 153, 0.2);
 
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 244 63% 58%;
+    --sidebar-background: 0 0% 10%;
+    --sidebar-foreground: 220 9% 66%;
+    --sidebar-primary: 217 91% 60%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 244 63% 58%;
+    --sidebar-accent: 0 0% 17%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 210 11% 17%;
+    --sidebar-ring: 217 91% 60%;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    --background: 210 11% 5%; /* #0D0D0D - Dark Base */
+    --foreground: 0 0% 100%;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 0 0% 10%; /* #1A1A1A */
+    --card-foreground: 0 0% 100%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 0 0% 10%;
+    --popover-foreground: 0 0% 100%;
 
-    --primary: 244 63% 58%;
+    --primary: 217 91% 60%; /* #3B82F6 - Neon Blue */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 270 60% 64%;
+    --secondary: 271 81% 56%; /* #9333EA - Purple Glow */
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 244 63% 58%;
+    --accent: 328 86% 70%; /* #EC4899 - Hot Pink */
     --accent-foreground: 0 0% 100%;
 
+    --muted: 210 11% 17%;
+    --muted-foreground: 220 9% 66%;
+
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 244 63% 58%;
+    --border: 210 11% 17%;
+    --input: 210 11% 17%;
+    --ring: 217 91% 60%;
 
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 244 63% 58%;
+    --sidebar-background: 0 0% 10%;
+    --sidebar-foreground: 220 9% 66%;
+    --sidebar-primary: 217 91% 60%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 244 63% 58%;
+    --sidebar-accent: 0 0% 17%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 210 11% 17%;
+    --sidebar-ring: 217 91% 60%;
   }
 }
 
@@ -105,21 +106,24 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+    font-family: 'Poppins', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 
   .glass-effect {
-    background: rgba(255, 255, 255, 0.05);
+    background: linear-gradient(135deg, rgba(96, 165, 250, 0.05), rgba(244, 114, 182, 0.05), rgba(192, 132, 252, 0.05));
     backdrop-filter: blur(20px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: var(--shadow-glass);
+    border: 1px solid rgba(96, 165, 250, 0.2);
+    box-shadow: 0 8px 32px 0 rgba(59, 130, 246, 0.15), 0 0 20px rgba(147, 51, 234, 0.1);
   }
 
   .glass-card {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+    background: linear-gradient(135deg, rgba(26, 26, 26, 0.8), rgba(26, 26, 26, 0.6));
     backdrop-filter: blur(20px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+    border: 1px solid rgba(96, 165, 250, 0.2);
+    box-shadow: 0 8px 32px 0 rgba(59, 130, 246, 0.15), 
+                0 0 0 1px rgba(147, 51, 234, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
   }
 
   .gradient-text {
