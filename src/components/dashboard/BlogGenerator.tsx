@@ -1,14 +1,15 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useToast } from "@/hooks/use-toast";
-import { Sparkles, FileText, Image as ImageIcon, Eye, History, Wand2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Sparkles, FileText, Image as ImageIcon, Eye, History, BarChart3 } from "lucide-react";
 import { BlogContentForm } from "./blog/BlogContentForm";
 import { BlogImageGenerator } from "./blog/BlogImageGenerator";
 import { BlogPreview } from "./blog/BlogPreview";
 import { BlogHistory } from "./blog/BlogHistory";
+import { BlogAnalytics } from "./blog/BlogAnalytics";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const BlogGenerator = () => {
   const [topic, setTopic] = useState("");
@@ -36,16 +37,9 @@ const BlogGenerator = () => {
     }
 
     setLoading(true);
-
     try {
       const { data, error } = await supabase.functions.invoke("generate-blog", {
-        body: {
-          topic,
-          keywords,
-          tone,
-          wordCount: parseInt(wordCount),
-          language,
-        },
+        body: { topic, keywords, tone, wordCount: parseInt(wordCount), language },
       });
 
       if (error) throw error;
@@ -79,68 +73,52 @@ const BlogGenerator = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 p-6 space-y-8">
-      {/* Hero Header */}
       <div className="text-center space-y-4 max-w-3xl mx-auto">
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium">
-          <Wand2 className="w-4 h-4" />
+          <Sparkles className="w-4 h-4" />
           AI-Powered Content Studio
         </div>
         <h1 className="text-5xl font-bold bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent">
           Premium Blog Generator
         </h1>
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-          Create professional, SEO-optimized blog posts with stunning visuals in multiple languages using advanced AI technology
+          Create professional, SEO-optimized blog posts with stunning visuals
         </p>
       </div>
 
-      {/* Main Content */}
       <div className="max-w-7xl mx-auto">
         <Tabs defaultValue="generate" className="w-full">
-          <TabsList className="grid w-full grid-cols-4 h-auto p-1 bg-muted/50 backdrop-blur-sm">
-            <TabsTrigger 
-              value="generate" 
-              className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all"
-            >
+          <TabsList className="grid w-full grid-cols-5 h-auto p-1 bg-muted/50 backdrop-blur-sm">
+            <TabsTrigger value="generate" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               <FileText className="w-4 h-4" />
-              <span className="hidden sm:inline">Generate Content</span>
-              <span className="sm:hidden">Content</span>
+              <span className="hidden sm:inline">Content</span>
             </TabsTrigger>
-            <TabsTrigger 
-              value="image"
-              className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all"
-            >
+            <TabsTrigger value="image" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               <ImageIcon className="w-4 h-4" />
-              <span className="hidden sm:inline">Generate Image</span>
-              <span className="sm:hidden">Image</span>
+              <span className="hidden sm:inline">Image</span>
             </TabsTrigger>
-            <TabsTrigger 
-              value="preview"
-              className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all"
-            >
-              <Eye className="w-4 h-4" />
+            <TabsTrigger value="preview" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              <Eye className="w-4 w-4" />
               <span className="hidden sm:inline">Preview</span>
-              <span className="sm:hidden">Preview</span>
             </TabsTrigger>
-            <TabsTrigger 
-              value="history"
-              className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all"
-            >
+            <TabsTrigger value="analytics" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              <BarChart3 className="w-4 h-4" />
+              <span className="hidden sm:inline">Analytics</span>
+            </TabsTrigger>
+            <TabsTrigger value="history" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               <History className="w-4 h-4" />
               <span className="hidden sm:inline">History</span>
-              <span className="sm:hidden">History</span>
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="generate" className="space-y-6 mt-6">
             <Card className="border-2 hover:border-primary/50 transition-all duration-300 shadow-lg">
-              <CardHeader className="space-y-1 pb-4">
+              <CardHeader>
                 <CardTitle className="text-2xl flex items-center gap-2">
                   <Sparkles className="w-6 h-6 text-primary" />
                   Content Generation
                 </CardTitle>
-                <CardDescription>
-                  Configure your blog post parameters for AI generation
-                </CardDescription>
+                <CardDescription>Configure your blog post parameters</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <BlogContentForm
@@ -184,14 +162,12 @@ const BlogGenerator = () => {
 
           <TabsContent value="image" className="space-y-6 mt-6">
             <Card className="border-2 hover:border-primary/50 transition-all duration-300 shadow-lg">
-              <CardHeader className="space-y-1 pb-4">
+              <CardHeader>
                 <CardTitle className="text-2xl flex items-center gap-2">
                   <ImageIcon className="w-6 h-6 text-primary" />
                   Visual Content Generation
                 </CardTitle>
-                <CardDescription>
-                  Create a stunning, custom image to accompany your blog post
-                </CardDescription>
+                <CardDescription>Create stunning custom images</CardDescription>
               </CardHeader>
               <CardContent>
                 <BlogImageGenerator
@@ -215,6 +191,10 @@ const BlogGenerator = () => {
               imagePrompt={imagePrompt}
               onSaved={handleSaved}
             />
+          </TabsContent>
+
+          <TabsContent value="analytics" className="mt-6">
+            <BlogAnalytics />
           </TabsContent>
 
           <TabsContent value="history" className="mt-6">
