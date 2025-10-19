@@ -14,6 +14,69 @@ export type Database = {
   }
   public: {
     Tables: {
+      ecommerce_products: {
+        Row: {
+          category: string
+          created_at: string
+          description: string
+          features: string | null
+          id: string
+          image_url: string | null
+          inventory_count: number | null
+          meta_description: string | null
+          price: number | null
+          product_name: string
+          selling_points: Json | null
+          sku: string | null
+          status: string
+          tags: Json | null
+          target_audience: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description: string
+          features?: string | null
+          id?: string
+          image_url?: string | null
+          inventory_count?: number | null
+          meta_description?: string | null
+          price?: number | null
+          product_name: string
+          selling_points?: Json | null
+          sku?: string | null
+          status?: string
+          tags?: Json | null
+          target_audience?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string
+          features?: string | null
+          id?: string
+          image_url?: string | null
+          inventory_count?: number | null
+          meta_description?: string | null
+          price?: number | null
+          product_name?: string
+          selling_points?: Json | null
+          sku?: string | null
+          status?: string
+          tags?: Json | null
+          target_audience?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       generated_blogs: {
         Row: {
           content: string
