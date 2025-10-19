@@ -47,6 +47,53 @@ const TeamCollaboration = () => {
     loadTeams();
   }, []);
 
+  // Accept invitation via token in URL
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('invitation');
+    if (!token) return;
+
+    const accept = async () => {
+      try {
+        const { data, error } = await supabase.functions.invoke('accept-team-invitation', {
+          body: { token },
+        });
+        if (error) throw error;
+        toast({
+          title: 'Invitation accepted',
+          description: 'You have joined the team.',
+        });
+        // Set current team to the one joined
+        if (data?.team_id) {
+          const { data: team } = await supabase
+            .from('teams')
+            .select('*')
+            .eq('id', data.team_id)
+            .maybeSingle();
+          if (team) {
+            setCurrentTeam(team as Team);
+          }
+        }
+        await loadTeams();
+        await loadInvitations();
+        await loadTeamMembers();
+      } catch (e: any) {
+        console.error('Accept invitation error:', e);
+        toast({
+          title: 'Failed to accept invitation',
+          description: e.message || 'Please try again later.',
+          variant: 'destructive',
+        });
+      } finally {
+        const url = new URL(window.location.href);
+        url.searchParams.delete('invitation');
+        window.history.replaceState({}, '', url.toString());
+      }
+    };
+
+    accept();
+  }, []);
+
   useEffect(() => {
     if (currentTeam) {
       loadTeamMembers();
