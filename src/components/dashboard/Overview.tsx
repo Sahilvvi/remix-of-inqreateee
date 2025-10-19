@@ -1,33 +1,121 @@
+import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
-import { FileText, MessageSquare, TrendingUp, Users } from "lucide-react";
+import { FileText, MessageSquare, TrendingUp, Users, ArrowUpRight, Clock } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
+
+interface Stats {
+  totalBlogs: number;
+  blogsThisWeek: number;
+  totalWords: number;
+  recentBlogs: Array<{
+    id: string;
+    title: string;
+    created_at: string;
+  }>;
+}
 
 const Overview = () => {
-  const stats = [
+  const navigate = useNavigate();
+  const [stats, setStats] = useState<Stats>({
+    totalBlogs: 0,
+    blogsThisWeek: 0,
+    totalWords: 0,
+    recentBlogs: [],
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchStats();
+    
+    // Set up realtime subscription
+    const channel = supabase
+      .channel('schema-db-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'generated_blogs'
+        },
+        () => {
+          fetchStats();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
+  const fetchStats = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // Get all blogs for the user
+      const { data: allBlogs, error: blogsError } = await supabase
+        .from('generated_blogs')
+        .select('id, title, created_at, word_count')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (blogsError) throw blogsError;
+
+      // Calculate stats
+      const totalBlogs = allBlogs?.length || 0;
+      const totalWords = allBlogs?.reduce((sum, blog) => sum + (blog.word_count || 0), 0) || 0;
+      
+      // Get blogs from this week
+      const oneWeekAgo = new Date();
+      oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+      const blogsThisWeek = allBlogs?.filter(blog => 
+        new Date(blog.created_at) > oneWeekAgo
+      ).length || 0;
+
+      // Get recent blogs for activity
+      const recentBlogs = allBlogs?.slice(0, 4) || [];
+
+      setStats({
+        totalBlogs,
+        blogsThisWeek,
+        totalWords,
+        recentBlogs,
+      });
+    } catch (error) {
+      console.error('Error fetching stats:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const statCards = [
     {
-      title: "Total Posts Generated",
-      value: "1,234",
-      change: "+12.5%",
+      title: "Total Blogs Generated",
+      value: loading ? "..." : stats.totalBlogs.toString(),
+      change: `+${stats.blogsThisWeek} this week`,
       icon: FileText,
       color: "from-blue-500 to-cyan-500",
     },
     {
-      title: "Social Media Posts",
-      value: "856",
-      change: "+8.2%",
+      title: "Total Words Written",
+      value: loading ? "..." : stats.totalWords.toLocaleString(),
+      change: `${Math.round(stats.totalWords / (stats.totalBlogs || 1))} avg/blog`,
       icon: MessageSquare,
       color: "from-purple-500 to-pink-500",
     },
     {
-      title: "SEO Score",
-      value: "94/100",
-      change: "+5 points",
+      title: "This Week's Activity",
+      value: loading ? "..." : `${stats.blogsThisWeek}`,
+      change: `${stats.totalBlogs > 0 ? Math.round((stats.blogsThisWeek / stats.totalBlogs) * 100) : 0}% of total`,
       icon: TrendingUp,
       color: "from-green-500 to-emerald-500",
     },
     {
-      title: "Engagement Rate",
-      value: "8.9%",
-      change: "+2.1%",
+      title: "Recent Activity",
+      value: loading ? "..." : stats.recentBlogs.length > 0 ? "Active" : "Start Now",
+      change: stats.recentBlogs.length > 0 ? "Last 7 days" : "Generate your first blog",
       icon: Users,
       color: "from-orange-500 to-red-500",
     },
@@ -47,7 +135,7 @@ const Overview = () => {
       </div>
 
       <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat, index) => {
+        {statCards.map((stat, index) => {
           const Icon = stat.icon;
           return (
             <Card 
@@ -72,22 +160,39 @@ const Overview = () => {
 
       <div className="grid md:grid-cols-2 gap-6">
         <Card className="p-6 glass-card hover-lift animate-scale-in" style={{ animationDelay: '0.4s' }}>
-          <h3 className="text-2xl font-bold mb-6 gradient-text">Recent Activity</h3>
+          <h3 className="text-2xl font-bold mb-6 gradient-text flex items-center gap-2">
+            <Clock className="w-6 h-6" />
+            Recent Activity
+          </h3>
           <div className="space-y-3">
-            {[
-              { action: "Blog post generated", time: "2 hours ago" },
-              { action: "Social media post scheduled", time: "5 hours ago" },
-              { action: "SEO analysis completed", time: "1 day ago" },
-              { action: "Template created", time: "2 days ago" },
-            ].map((item, index) => (
-              <div 
-                key={index} 
-                className="flex justify-between items-center p-4 rounded-xl glass-effect hover:bg-accent/50 transition-all duration-300 hover-lift cursor-pointer group"
-              >
-                <p className="font-semibold group-hover:gradient-text transition-all">{item.action}</p>
-                <p className="text-sm text-muted-foreground">{item.time}</p>
+            {loading ? (
+              <div className="text-center py-8 text-muted-foreground">Loading...</div>
+            ) : stats.recentBlogs.length > 0 ? (
+              stats.recentBlogs.map((blog, index) => (
+                <div 
+                  key={blog.id} 
+                  className="flex justify-between items-center p-4 rounded-xl glass-effect hover:bg-accent/50 transition-all duration-300 hover-lift cursor-pointer group"
+                  onClick={() => navigate('/dashboard')}
+                >
+                  <div className="flex-1">
+                    <p className="font-semibold group-hover:gradient-text transition-all truncate">
+                      {blog.title || "Untitled Blog"}
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">Blog post generated</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm text-muted-foreground">
+                      {new Date(blog.created_at).toLocaleDateString()}
+                    </p>
+                    <ArrowUpRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                No activity yet. Start by generating your first blog!
               </div>
-            ))}
+            )}
           </div>
         </Card>
 
@@ -95,17 +200,25 @@ const Overview = () => {
           <h3 className="text-2xl font-bold mb-6 gradient-text">Quick Actions</h3>
           <div className="grid grid-cols-2 gap-4">
             {[
-              "Generate Blog",
-              "Create Post",
-              "SEO Check",
-              "New Template",
+              { label: "Generate Blog", route: "/dashboard", action: "blog" },
+              { label: "Create Post", route: "/dashboard", action: "social" },
+              { label: "SEO Check", route: "/dashboard", action: "seo" },
+              { label: "View Analytics", route: "/dashboard", action: "analytics" },
             ].map((action, index) => (
               <button
                 key={index}
+                onClick={() => {
+                  navigate(action.route);
+                  // Simulate clicking the appropriate tab
+                  setTimeout(() => {
+                    const event = new CustomEvent('dashboard-navigate', { detail: action.action });
+                    window.dispatchEvent(event);
+                  }, 100);
+                }}
                 className="p-6 glass-card hover-glow rounded-xl transition-all duration-300 hover-lift text-left group border-2 border-transparent relative overflow-hidden"
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-secondary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                <p className="font-semibold relative z-10 gradient-text text-lg">{action}</p>
+                <p className="font-semibold relative z-10 gradient-text text-lg">{action.label}</p>
               </button>
             ))}
           </div>

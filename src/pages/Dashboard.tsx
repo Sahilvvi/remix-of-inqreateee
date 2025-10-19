@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import Overview from "@/components/dashboard/Overview";
 import BlogGenerator from "@/components/dashboard/BlogGenerator";
@@ -13,6 +13,17 @@ import { Card } from "@/components/ui/card";
 
 const Dashboard = () => {
   const [activeRoute, setActiveRoute] = useState("overview");
+
+  useEffect(() => {
+    const handleNavigate = (event: CustomEvent) => {
+      setActiveRoute(event.detail);
+    };
+
+    window.addEventListener('dashboard-navigate', handleNavigate as EventListener);
+    return () => {
+      window.removeEventListener('dashboard-navigate', handleNavigate as EventListener);
+    };
+  }, []);
 
   const renderContent = () => {
     switch (activeRoute) {
