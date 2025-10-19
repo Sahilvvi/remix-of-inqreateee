@@ -9,6 +9,7 @@ import BrandTemplates from "@/components/dashboard/BrandTemplates";
 import EcommerceGenerator from "@/components/dashboard/EcommerceGenerator";
 import Analytics from "@/components/dashboard/Analytics";
 import TeamCollaboration from "@/components/dashboard/TeamCollaboration";
+import Settings from "@/pages/Settings";
 import { Card } from "@/components/ui/card";
 
 const Dashboard = () => {
@@ -45,6 +46,8 @@ const Dashboard = () => {
         return <Analytics />;
       case "team":
         return <TeamCollaboration />;
+      case "settings":
+        return <Settings />;
       default:
         return (
           <Card className="p-12 text-center glass-effect">
