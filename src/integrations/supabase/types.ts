@@ -14,6 +14,54 @@ export type Database = {
   }
   public: {
     Tables: {
+      generated_blogs: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          image_prompt: string | null
+          image_url: string | null
+          keywords: string | null
+          language: string
+          title: string
+          tone: string
+          topic: string
+          updated_at: string
+          user_id: string
+          word_count: number
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          image_prompt?: string | null
+          image_url?: string | null
+          keywords?: string | null
+          language?: string
+          title: string
+          tone: string
+          topic: string
+          updated_at?: string
+          user_id: string
+          word_count: number
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          image_prompt?: string | null
+          image_url?: string | null
+          keywords?: string | null
+          language?: string
+          title?: string
+          tone?: string
+          topic?: string
+          updated_at?: string
+          user_id?: string
+          word_count?: number
+        }
+        Relationships: []
+      }
       team_invitations: {
         Row: {
           created_at: string

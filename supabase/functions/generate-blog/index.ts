@@ -11,7 +11,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { topic, keywords, tone, wordCount } = await req.json();
+    const { topic, keywords, tone, wordCount, language = 'english' } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
 
     if (!LOVABLE_API_KEY) {
@@ -22,7 +22,7 @@ Deno.serve(async (req) => {
 
     const systemPrompt = `You are an expert content writer. Generate high-quality, engaging blog posts that are SEO-optimized and well-structured. Always include a title, introduction, main body with subheadings, and conclusion.`;
 
-    const userPrompt = `Write a ${tone} blog post about "${topic}". 
+    const userPrompt = `Write a ${tone} blog post about "${topic}" in ${language} language. 
 Keywords to include: ${keywords}
 Target word count: approximately ${wordCount} words
 
@@ -31,7 +31,9 @@ Please format the blog post with:
 - An engaging introduction
 - Well-organized main content with subheadings
 - A strong conclusion
-- Natural integration of the keywords`;
+- Natural integration of the keywords
+
+IMPORTANT: Write the ENTIRE blog post in ${language} language.`;
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
