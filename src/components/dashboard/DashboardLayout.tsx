@@ -14,6 +14,7 @@ import {
   Settings,
   LogOut,
   Sparkles,
+  Users,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -68,6 +69,7 @@ const DashboardLayout = ({ children, activeRoute, onRouteChange }: DashboardLayo
     { id: "templates", label: "Brand Templates", icon: Palette },
     { id: "ecommerce", label: "E-Commerce", icon: ShoppingCart },
     { id: "analytics", label: "Analytics", icon: BarChart3 },
+    { id: "team", label: "Team", icon: Users },
   ];
 
   if (!user) {

@@ -8,6 +8,7 @@ import SeoOptimization from "@/components/dashboard/SeoOptimization";
 import BrandTemplates from "@/components/dashboard/BrandTemplates";
 import EcommerceGenerator from "@/components/dashboard/EcommerceGenerator";
 import Analytics from "@/components/dashboard/Analytics";
+import TeamCollaboration from "@/components/dashboard/TeamCollaboration";
 import { Card } from "@/components/ui/card";
 
 const Dashboard = () => {
@@ -31,6 +32,8 @@ const Dashboard = () => {
         return <EcommerceGenerator />;
       case "analytics":
         return <Analytics />;
+      case "team":
+        return <TeamCollaboration />;
       default:
         return (
           <Card className="p-12 text-center glass-effect">
