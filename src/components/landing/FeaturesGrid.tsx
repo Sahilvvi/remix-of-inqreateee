@@ -19,69 +19,86 @@ const FeaturesGrid = () => {
       title: "User Dashboard",
       description: "Centralized control center for all your content needs",
       color: "from-blue-500 to-cyan-500",
+      image: "📊",
     },
     {
       icon: Globe,
       title: "Multi-language AI Content",
       description: "Generate content in 50+ languages instantly",
       color: "from-purple-500 to-pink-500",
+      image: "🌍",
     },
     {
       icon: Calendar,
       title: "Direct Posting & Scheduling",
       description: "Auto-publish to all platforms at optimal times",
       color: "from-green-500 to-emerald-500",
+      image: "📅",
     },
     {
       icon: ImageIcon,
       title: "AI Image Generator + Library",
       description: "Create and store unlimited AI-generated visuals",
       color: "from-orange-500 to-red-500",
+      image: "🎨",
     },
     {
       icon: FileSearch,
       title: "SEO Blog Optimizer",
       description: "Rank higher with AI-powered SEO analysis",
       color: "from-indigo-500 to-purple-500",
+      image: "🔍",
     },
     {
       icon: ShoppingBag,
       title: "E-commerce Content Tools",
       description: "Product descriptions that convert visitors to buyers",
       color: "from-pink-500 to-rose-500",
+      image: "🛍️",
     },
     {
       icon: Palette,
       title: "Brand Kit",
       description: "Maintain consistent branding across all content",
       color: "from-cyan-500 to-blue-500",
+      image: "🎯",
     },
     {
       icon: FileText,
       title: "Content Templates Library",
       description: "1000+ proven templates for every platform",
       color: "from-yellow-500 to-orange-500",
+      image: "📝",
     },
     {
       icon: Users,
       title: "Team Collaboration",
       description: "Work together seamlessly with your team",
       color: "from-teal-500 to-green-500",
+      image: "👥",
     },
     {
       icon: DollarSign,
       title: "Monetization Features",
       description: "Turn your content into revenue streams",
       color: "from-red-500 to-pink-500",
+      image: "💰",
     },
   ];
 
   return (
-    <section className="relative py-32 overflow-hidden">
-      {/* Background effects */}
+    <section className="relative py-32 overflow-hidden" id="features">
+      {/* Enhanced background effects */}
       <div className="absolute inset-0 bg-gradient-to-b from-accent/5 via-background to-primary/5"></div>
       <div className="absolute top-1/3 right-0 w-96 h-96 bg-secondary rounded-full blur-3xl opacity-15 animate-pulse-slow"></div>
       <div className="absolute bottom-1/3 left-0 w-96 h-96 bg-accent rounded-full blur-3xl opacity-15 animate-pulse-slow"></div>
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-r from-primary/5 via-secondary/5 to-accent/5 rounded-full blur-3xl animate-pulse-slow" style={{ animationDelay: '2s' }}></div>
+      
+      {/* Animated grid pattern */}
+      <div className="absolute inset-0 opacity-[0.02]" style={{ 
+        backgroundImage: 'linear-gradient(hsl(var(--primary)) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--primary)) 1px, transparent 1px)',
+        backgroundSize: '50px 50px'
+      }}></div>
 
       <div className="container mx-auto px-6 relative z-10">
         <div className="text-center mb-20 animate-slide-up">
@@ -103,12 +120,21 @@ const FeaturesGrid = () => {
               {/* Animated shine effect */}
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
               
+              {/* Floating emoji decoration */}
+              <div className="absolute -top-3 -right-3 text-4xl opacity-20 group-hover:opacity-40 group-hover:scale-125 transition-all duration-300">
+                {feature.image}
+              </div>
+              
               <CardContent className="p-6 text-center relative z-10">
-                <div className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br ${feature.color} mb-4 group-hover:scale-110 transition-transform duration-300 animate-glow`}>
-                  <feature.icon className="w-8 h-8 text-white" />
+                <div className="relative mb-4">
+                  {/* Glow effect behind icon */}
+                  <div className={`absolute inset-0 bg-gradient-to-br ${feature.color} rounded-2xl blur-xl opacity-0 group-hover:opacity-50 transition-opacity duration-300`}></div>
+                  <div className={`relative inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br ${feature.color} group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
+                    <feature.icon className="w-8 h-8 text-white" />
+                  </div>
                 </div>
-                <h3 className="text-lg font-bold mb-2 gradient-text">{feature.title}</h3>
-                <p className="text-sm text-muted-foreground">{feature.description}</p>
+                <h3 className="text-lg font-bold mb-2 gradient-text group-hover:scale-105 transition-transform duration-300">{feature.title}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{feature.description}</p>
               </CardContent>
             </Card>
           ))}
