@@ -53,11 +53,11 @@ const Hero = () => {
             </p>
 
             {/* CTA Buttons */}
-            <div className="flex flex-wrap gap-6">
+            <div className="flex flex-wrap gap-6 items-center">
               <Link to="/auth">
                 <Button 
                   size="lg" 
-                  className="group h-14 px-8 text-lg font-semibold bg-gradient-to-r from-[#3B82F6] via-[#9333EA] to-[#EC4899] hover:shadow-neon animate-shine relative overflow-hidden rounded-xl"
+                  className="group h-14 px-8 text-lg font-semibold bg-gradient-to-r from-[#3B82F6] via-[#9333EA] to-[#EC4899] hover:shadow-neon relative overflow-hidden rounded-xl transition-all duration-300 hover:scale-105"
                 >
                   <span className="relative z-10 flex items-center gap-2">
                     Start Free
@@ -69,7 +69,7 @@ const Hero = () => {
               <Button 
                 size="lg" 
                 variant="outline"
-                className="group h-14 px-8 text-lg font-semibold glass-card hover-glow border-2 border-[#3B82F6]/50 text-white rounded-xl"
+                className="group h-14 px-8 text-lg font-semibold glass-card hover-glow border-2 border-[#3B82F6]/50 text-white rounded-xl transition-all duration-300 hover:scale-105"
               >
                 <Play className="mr-2 w-5 h-5" />
                 See Demo
