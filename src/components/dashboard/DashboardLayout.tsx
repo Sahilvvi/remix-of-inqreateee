@@ -146,7 +146,7 @@ const DashboardLayout = ({ children, activeRoute, onRouteChange }: DashboardLayo
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted/30">
       {/* Mobile Header */}
-      <header className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-card border-b z-50 flex items-center justify-between px-4">
+      <header className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-card/95 backdrop-blur-md border-b z-50 flex items-center justify-between px-4">
         <img 
           src={inqreateLogo} 
           alt="Inqreate Logo" 
@@ -154,18 +154,18 @@ const DashboardLayout = ({ children, activeRoute, onRouteChange }: DashboardLayo
         />
         <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
           <SheetTrigger asChild>
-            <Button variant="ghost" size="icon">
-              <Menu className="w-6 h-6" />
+            <Button variant="outline" size="icon" className="h-10 w-10 border-2">
+              <Menu className="w-5 h-5" />
             </Button>
           </SheetTrigger>
-          <SheetContent side="left" className="w-[280px] p-6 flex flex-col">
+          <SheetContent side="left" className="w-[280px] p-6 flex flex-col bg-card z-[100]">
             <SidebarContent />
           </SheetContent>
         </Sheet>
       </header>
 
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 bg-card border-r p-6 overflow-y-auto flex-col">
+      <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 bg-card border-r p-6 overflow-y-auto flex-col z-40">
         <SidebarContent />
       </aside>
 
