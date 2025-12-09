@@ -14,11 +14,15 @@ import {
   Settings,
   LogOut,
   Users,
+  Menu,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import inqreateLogo from "@/assets/inqreate-logo.png";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -29,8 +33,10 @@ interface DashboardLayoutProps {
 const DashboardLayout = ({ children, activeRoute, onRouteChange }: DashboardLayoutProps) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -72,67 +78,99 @@ const DashboardLayout = ({ children, activeRoute, onRouteChange }: DashboardLayo
     { id: "team", label: "Team", icon: Users },
   ];
 
+  const handleRouteChange = (route: string) => {
+    onRouteChange(route);
+    setSidebarOpen(false);
+  };
+
   if (!user) {
     return null;
   }
 
+  const SidebarContent = () => (
+    <>
+      <div className="flex items-center gap-2 mb-8">
+        <img 
+          src={inqreateLogo} 
+          alt="Inqreate Logo" 
+          className="h-10 w-auto object-contain"
+        />
+      </div>
+
+      <nav className="space-y-2 flex-1">
+        {menuItems.map((item) => {
+          const Icon = item.icon;
+          return (
+            <button
+              key={item.id}
+              onClick={() => handleRouteChange(item.id)}
+              className={cn(
+                "w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all text-sm",
+                activeRoute === item.id
+                  ? "bg-primary text-primary-foreground shadow-lg"
+                  : "hover:bg-muted"
+              )}
+            >
+              <Icon className="w-5 h-5 shrink-0" />
+              <span>{item.label}</span>
+            </button>
+          );
+        })}
+      </nav>
+
+      <div className="mt-8 pt-8 border-t space-y-2">
+        <button
+          onClick={() => handleRouteChange("settings")}
+          className={cn(
+            "w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all text-sm",
+            activeRoute === "settings"
+              ? "bg-primary text-primary-foreground"
+              : "hover:bg-muted"
+          )}
+        >
+          <Settings className="w-5 h-5 shrink-0" />
+          <span>Settings</span>
+        </button>
+        <Button
+          variant="ghost"
+          className="w-full justify-start text-sm"
+          onClick={handleLogout}
+        >
+          <LogOut className="w-5 h-5 mr-3 shrink-0" />
+          Logout
+        </Button>
+      </div>
+    </>
+  );
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted/30">
-      <aside className="fixed left-0 top-0 bottom-0 w-64 bg-card border-r p-6 overflow-y-auto">
-        <div className="flex items-center gap-2 mb-8">
-          <img 
-            src={inqreateLogo} 
-            alt="Inqreate Logo" 
-            className="h-10 w-auto object-contain"
-          />
-        </div>
+      {/* Mobile Header */}
+      <header className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-card border-b z-50 flex items-center justify-between px-4">
+        <img 
+          src={inqreateLogo} 
+          alt="Inqreate Logo" 
+          className="h-8 w-auto object-contain"
+        />
+        <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
+          <SheetTrigger asChild>
+            <Button variant="ghost" size="icon">
+              <Menu className="w-6 h-6" />
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="left" className="w-[280px] p-6 flex flex-col">
+            <SidebarContent />
+          </SheetContent>
+        </Sheet>
+      </header>
 
-        <nav className="space-y-2">
-          {menuItems.map((item) => {
-            const Icon = item.icon;
-            return (
-              <button
-                key={item.id}
-                onClick={() => onRouteChange(item.id)}
-                className={cn(
-                  "w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all",
-                  activeRoute === item.id
-                    ? "bg-primary text-primary-foreground shadow-lg"
-                    : "hover:bg-muted"
-                )}
-              >
-                <Icon className="w-5 h-5" />
-                <span>{item.label}</span>
-              </button>
-            );
-          })}
-        </nav>
-
-        <div className="mt-8 pt-8 border-t space-y-2">
-          <button
-            onClick={() => onRouteChange("settings")}
-            className={cn(
-              "w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all",
-              activeRoute === "settings"
-                ? "bg-primary text-primary-foreground"
-                : "hover:bg-muted"
-            )}
-          >
-            <Settings className="w-5 h-5" />
-            <span>Settings</span>
-          </button>
-          <Button
-            variant="ghost"
-            className="w-full justify-start"
-            onClick={handleLogout}
-          >
-            <LogOut className="w-5 h-5 mr-3" />
-            Logout
-          </Button>
-        </div>
+      {/* Desktop Sidebar */}
+      <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 bg-card border-r p-6 overflow-y-auto flex-col">
+        <SidebarContent />
       </aside>
 
-      <main className="ml-64 p-8">{children}</main>
+      {/* Main Content */}
+      <main className="lg:ml-64 pt-20 lg:pt-8 p-4 sm:p-6 lg:p-8">{children}</main>
     </div>
   );
 };
