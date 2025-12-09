@@ -84,7 +84,6 @@ const DashboardLayout = ({ children, activeRoute, onRouteChange }: DashboardLayo
             src={inqreateLogo} 
             alt="Inqreate Logo" 
             className="h-10 w-auto object-contain"
-            style={{ mixBlendMode: 'multiply' }}
           />
         </div>
 
