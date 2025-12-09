@@ -99,36 +99,36 @@ const Settings = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <div>
-        <h1 className="text-3xl font-bold gradient-text mb-2">Settings</h1>
-        <p className="text-muted-foreground">Manage your account and preferences</p>
+        <h1 className="text-2xl sm:text-3xl font-bold gradient-text mb-2">Settings</h1>
+        <p className="text-sm sm:text-base text-muted-foreground">Manage your account and preferences</p>
       </div>
 
       <Tabs defaultValue="profile" className="w-full">
-        <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6">
-          <TabsTrigger value="profile" className="gap-2">
-            <User className="h-4 w-4" />
+        <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6 h-auto p-1">
+          <TabsTrigger value="profile" className="gap-1 sm:gap-2 text-xs sm:text-sm px-1 sm:px-3">
+            <User className="h-3 w-3 sm:h-4 sm:w-4" />
             <span className="hidden sm:inline">Profile</span>
           </TabsTrigger>
-          <TabsTrigger value="notifications" className="gap-2">
-            <Bell className="h-4 w-4" />
-            <span className="hidden sm:inline">Notifications</span>
+          <TabsTrigger value="notifications" className="gap-1 sm:gap-2 text-xs sm:text-sm px-1 sm:px-3">
+            <Bell className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">Alerts</span>
           </TabsTrigger>
-          <TabsTrigger value="security" className="gap-2">
-            <Shield className="h-4 w-4" />
+          <TabsTrigger value="security" className="gap-1 sm:gap-2 text-xs sm:text-sm px-1 sm:px-3">
+            <Shield className="h-3 w-3 sm:h-4 sm:w-4" />
             <span className="hidden sm:inline">Security</span>
           </TabsTrigger>
-          <TabsTrigger value="appearance" className="gap-2">
-            <Moon className="h-4 w-4" />
-            <span className="hidden sm:inline">Appearance</span>
+          <TabsTrigger value="appearance" className="gap-1 sm:gap-2 text-xs sm:text-sm px-1 sm:px-3">
+            <Moon className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">Theme</span>
           </TabsTrigger>
-          <TabsTrigger value="content" className="gap-2">
-            <Zap className="h-4 w-4" />
+          <TabsTrigger value="content" className="gap-1 sm:gap-2 text-xs sm:text-sm px-1 sm:px-3">
+            <Zap className="h-3 w-3 sm:h-4 sm:w-4" />
             <span className="hidden sm:inline">Content</span>
           </TabsTrigger>
-          <TabsTrigger value="billing" className="gap-2">
-            <CreditCard className="h-4 w-4" />
+          <TabsTrigger value="billing" className="gap-1 sm:gap-2 text-xs sm:text-sm px-1 sm:px-3">
+            <CreditCard className="h-3 w-3 sm:h-4 sm:w-4" />
             <span className="hidden sm:inline">Billing</span>
           </TabsTrigger>
         </TabsList>

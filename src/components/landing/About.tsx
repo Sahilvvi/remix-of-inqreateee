@@ -33,7 +33,7 @@ const About = () => {
             What <span className="gradient-text neon-text">We Do</span>
           </h2>
           <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto">
-            AI Block Automation is your all-in-one platform for automating content creation, SEO optimization,
+            Inqreate is your all-in-one platform for automating content creation, SEO optimization,
             and digital workflow management using advanced AI technology.
           </p>
         </div>

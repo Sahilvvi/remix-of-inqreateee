@@ -7,7 +7,7 @@ const Testimonials = () => {
     {
       name: "Sarah Johnson",
       role: "Content Manager",
-      content: "AI Block Automation has transformed our content workflow. We're now producing 10x more content in half the time!",
+      content: "Inqreate has transformed our content workflow. We're now producing 10x more content in half the time!",
       rating: 5,
       initials: "SJ",
     },

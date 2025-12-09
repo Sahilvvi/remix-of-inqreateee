@@ -78,26 +78,26 @@ const SeoOptimization = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <div>
-        <h1 className="text-3xl font-bold gradient-text mb-2">SEO Optimization</h1>
-        <p className="text-muted-foreground">Analyze and improve your content's SEO</p>
+        <h1 className="text-2xl sm:text-3xl font-bold gradient-text mb-2">SEO Optimization</h1>
+        <p className="text-sm sm:text-base text-muted-foreground">Analyze and improve your content's SEO</p>
       </div>
 
       <Tabs defaultValue="analyze" className="w-full">
         <TabsList className="grid w-full max-w-md grid-cols-2">
-          <TabsTrigger value="analyze" className="flex items-center gap-2">
-            <FileSearch className="h-4 w-4" />
+          <TabsTrigger value="analyze" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+            <FileSearch className="h-3 w-3 sm:h-4 sm:w-4" />
             Analyze
           </TabsTrigger>
-          <TabsTrigger value="history" className="flex items-center gap-2">
-            <History className="h-4 w-4" />
+          <TabsTrigger value="history" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+            <History className="h-3 w-3 sm:h-4 sm:w-4" />
             History
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="analyze" className="mt-6">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <TabsContent value="analyze" className="mt-4 sm:mt-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         <Card className="glass-effect">
           <CardHeader>
             <CardTitle>Content Analysis</CardTitle>

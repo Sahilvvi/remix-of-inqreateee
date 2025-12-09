@@ -66,7 +66,7 @@ const Auth = () => {
 
         toast({
           title: "Account created!",
-          description: "Welcome to AI Block Automation. You're now logged in.",
+          description: "Welcome to Inqreate. You're now logged in.",
         });
         navigate("/dashboard");
       }
@@ -82,14 +82,14 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/10 to-secondary/10 p-6">
-      <Card className="w-full max-w-md p-8 glass-effect">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/10 to-secondary/10 p-4 sm:p-6">
+      <Card className="w-full max-w-md p-6 sm:p-8 glass-effect">
         <div className="flex items-center justify-center gap-2 mb-8">
           <Sparkles className="w-8 h-8 text-primary animate-glow" />
-          <h1 className="text-2xl font-bold gradient-text">AI Block Automation</h1>
+          <h1 className="text-xl sm:text-2xl font-bold gradient-text">Inqreate</h1>
         </div>
 
-        <h2 className="text-2xl font-bold text-center mb-6">
+        <h2 className="text-xl sm:text-2xl font-bold text-center mb-6">
           {isLogin ? "Welcome Back" : "Create Account"}
         </h2>
 

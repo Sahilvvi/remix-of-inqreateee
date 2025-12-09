@@ -329,13 +329,13 @@ const TeamCollaboration = () => {
   };
 
   return (
-    <div className="space-y-8 relative">
+    <div className="space-y-6 sm:space-y-8 relative">
       {/* Background effects */}
-      <div className="absolute -top-20 right-0 w-96 h-96 bg-primary rounded-full blur-3xl opacity-10 animate-pulse-slow pointer-events-none"></div>
+      <div className="absolute -top-20 right-0 w-48 sm:w-96 h-48 sm:h-96 bg-primary rounded-full blur-3xl opacity-10 animate-pulse-slow pointer-events-none"></div>
 
       <div className="animate-slide-up">
-        <h1 className="text-4xl md:text-5xl font-bold mb-2 gradient-text neon-text">Team Collaboration</h1>
-        <p className="text-lg text-muted-foreground">Work together with your team on AI-powered content</p>
+        <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold mb-2 gradient-text neon-text">Team Collaboration</h1>
+        <p className="text-sm sm:text-lg text-muted-foreground">Work together with your team on AI-powered content</p>
       </div>
 
       {/* Create Team Section */}

@@ -183,29 +183,29 @@ const EcommerceGenerator = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <div>
-        <h1 className="text-3xl font-bold gradient-text mb-2">E-Commerce Product Generator</h1>
-        <p className="text-muted-foreground">Generate optimized product listings with AI</p>
+        <h1 className="text-2xl sm:text-3xl font-bold gradient-text mb-2">E-Commerce Product Generator</h1>
+        <p className="text-sm sm:text-base text-muted-foreground">Generate optimized product listings with AI</p>
       </div>
 
       <Tabs defaultValue="generate" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-4 text-xs sm:text-sm">
           <TabsTrigger value="generate">
-            <Package className="h-4 w-4 mr-2" />
-            Generate
+            <Package className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-2" />
+            <span className="hidden sm:inline">Generate</span>
           </TabsTrigger>
           <TabsTrigger value="preview">
-            <Eye className="h-4 w-4 mr-2" />
-            Preview
+            <Eye className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-2" />
+            <span className="hidden sm:inline">Preview</span>
           </TabsTrigger>
           <TabsTrigger value="history">
-            <History className="h-4 w-4 mr-2" />
-            History
+            <History className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-2" />
+            <span className="hidden sm:inline">History</span>
           </TabsTrigger>
           <TabsTrigger value="analytics">
-            <BarChart3 className="h-4 w-4 mr-2" />
-            Analytics
+            <BarChart3 className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-2" />
+            <span className="hidden sm:inline">Analytics</span>
           </TabsTrigger>
         </TabsList>
 

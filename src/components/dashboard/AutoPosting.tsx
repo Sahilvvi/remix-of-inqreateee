@@ -130,22 +130,22 @@ const AutoPosting = () => {
   const PlatformIcon = platformIcons[platform] || Instagram;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 p-6 space-y-8">
-      <div className="text-center space-y-4 max-w-3xl mx-auto">
-        <h1 className="text-5xl font-bold bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 p-3 sm:p-6 space-y-6 sm:space-y-8">
+      <div className="text-center space-y-3 sm:space-y-4 max-w-3xl mx-auto">
+        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent">
           Auto Posting Scheduler
         </h1>
-        <p className="text-lg text-muted-foreground">
+        <p className="text-sm sm:text-lg text-muted-foreground">
           Schedule and manage posts across all your social media platforms
         </p>
       </div>
 
       <Tabs defaultValue="schedule" className="max-w-7xl mx-auto">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-4 text-xs sm:text-sm">
           <TabsTrigger value="schedule">Schedule</TabsTrigger>
-          <TabsTrigger value="connect">Connect Accounts</TabsTrigger>
+          <TabsTrigger value="connect">Connect</TabsTrigger>
           <TabsTrigger value="analytics">Analytics</TabsTrigger>
-          <TabsTrigger value="calendar">Calendar View</TabsTrigger>
+          <TabsTrigger value="calendar">Calendar</TabsTrigger>
         </TabsList>
 
         <TabsContent value="schedule" className="space-y-6 mt-6">
