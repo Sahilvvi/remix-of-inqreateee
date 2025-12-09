@@ -13,10 +13,10 @@ import {
   BarChart3,
   Settings,
   LogOut,
-  Sparkles,
   Users,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import inqreateLogo from "@/assets/inqreate-logo.png";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
@@ -80,8 +80,12 @@ const DashboardLayout = ({ children, activeRoute, onRouteChange }: DashboardLayo
     <div className="min-h-screen bg-gradient-to-br from-background to-muted/30">
       <aside className="fixed left-0 top-0 bottom-0 w-64 bg-card border-r p-6 overflow-y-auto">
         <div className="flex items-center gap-2 mb-8">
-          <Sparkles className="w-6 h-6 text-primary" />
-          <span className="font-bold gradient-text text-xl">Inqreate</span>
+          <img 
+            src={inqreateLogo} 
+            alt="Inqreate Logo" 
+            className="h-10 w-auto object-contain"
+            style={{ mixBlendMode: 'multiply' }}
+          />
         </div>
 
         <nav className="space-y-2">

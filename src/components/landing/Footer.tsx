@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
-import { Zap, Twitter, Linkedin, Youtube } from "lucide-react";
+import { Twitter, Linkedin, Youtube } from "lucide-react";
+import inqreateLogo from "@/assets/inqreate-logo.png";
 
 const Footer = () => {
   const footerLinks = {
@@ -30,12 +31,11 @@ const Footer = () => {
           {/* Brand Section */}
           <div className="lg:col-span-2">
             <Link to="/" className="flex items-center gap-2 mb-6 group">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#3B82F6] via-[#9333EA] to-[#EC4899] flex items-center justify-center group-hover:shadow-neon transition-all duration-300">
-                <Zap className="w-6 h-6 text-white" />
-              </div>
-              <span className="text-2xl font-bold bg-gradient-to-r from-[#3B82F6] via-[#9333EA] to-[#EC4899] bg-clip-text text-transparent">
-                Inqreate
-              </span>
+              <img 
+                src={inqreateLogo} 
+                alt="Inqreate Logo" 
+                className="h-12 w-auto object-contain group-hover:scale-105 transition-transform duration-300 brightness-0 invert"
+              />
             </Link>
             <p className="text-[#9CA3AF] mb-6 max-w-sm">
               Automate Smarter. Create Faster. Your all-in-one AI platform for content creation, posting, and growth.
