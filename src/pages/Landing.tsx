@@ -2,8 +2,10 @@ import Navbar from "@/components/landing/Navbar";
 import Hero from "@/components/landing/Hero";
 import Stats from "@/components/landing/Stats";
 import FeaturesGrid from "@/components/landing/FeaturesGrid";
+import LanguageSupport from "@/components/landing/LanguageSupport";
 import AIShowcase from "@/components/landing/AIShowcase";
 import HowItWorks from "@/components/landing/HowItWorks";
+import BrandKitSection from "@/components/landing/BrandKitSection";
 import UseCases from "@/components/landing/UseCases";
 import Comparison from "@/components/landing/Comparison";
 import Testimonials from "@/components/landing/Testimonials";
@@ -19,8 +21,10 @@ const Landing = () => {
       <Hero />
       <Stats />
       <FeaturesGrid />
+      <LanguageSupport />
       <AIShowcase />
       <HowItWorks />
+      <BrandKitSection />
       <UseCases />
       <Comparison />
       <Testimonials />
