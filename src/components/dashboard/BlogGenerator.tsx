@@ -72,16 +72,16 @@ const BlogGenerator = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 p-6 space-y-8">
-      <div className="text-center space-y-4 max-w-3xl mx-auto">
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium">
-          <Sparkles className="w-4 h-4" />
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 p-3 sm:p-6 space-y-6 sm:space-y-8">
+      <div className="text-center space-y-3 sm:space-y-4 max-w-3xl mx-auto">
+        <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-primary/10 text-primary text-xs sm:text-sm font-medium">
+          <Sparkles className="w-3 h-3 sm:w-4 sm:h-4" />
           AI-Powered Content Studio
         </div>
-        <h1 className="text-5xl font-bold bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent">
+        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent">
           Premium Blog Generator
         </h1>
-        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+        <p className="text-sm sm:text-lg text-muted-foreground max-w-2xl mx-auto">
           Create professional, SEO-optimized blog posts with stunning visuals
         </p>
       </div>
@@ -89,24 +89,24 @@ const BlogGenerator = () => {
       <div className="max-w-7xl mx-auto">
         <Tabs defaultValue="generate" className="w-full">
           <TabsList className="grid w-full grid-cols-5 h-auto p-1 bg-muted/50 backdrop-blur-sm">
-            <TabsTrigger value="generate" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-              <FileText className="w-4 h-4" />
+            <TabsTrigger value="generate" className="gap-1 sm:gap-2 text-xs sm:text-sm px-1 sm:px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              <FileText className="w-3 h-3 sm:w-4 sm:h-4" />
               <span className="hidden sm:inline">Content</span>
             </TabsTrigger>
-            <TabsTrigger value="image" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-              <ImageIcon className="w-4 h-4" />
+            <TabsTrigger value="image" className="gap-1 sm:gap-2 text-xs sm:text-sm px-1 sm:px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              <ImageIcon className="w-3 h-3 sm:w-4 sm:h-4" />
               <span className="hidden sm:inline">Image</span>
             </TabsTrigger>
-            <TabsTrigger value="preview" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-              <Eye className="w-4 w-4" />
+            <TabsTrigger value="preview" className="gap-1 sm:gap-2 text-xs sm:text-sm px-1 sm:px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              <Eye className="w-3 h-3 sm:w-4 w-4" />
               <span className="hidden sm:inline">Preview</span>
             </TabsTrigger>
-            <TabsTrigger value="analytics" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-              <BarChart3 className="w-4 h-4" />
+            <TabsTrigger value="analytics" className="gap-1 sm:gap-2 text-xs sm:text-sm px-1 sm:px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              <BarChart3 className="w-3 h-3 sm:w-4 sm:h-4" />
               <span className="hidden sm:inline">Analytics</span>
             </TabsTrigger>
-            <TabsTrigger value="history" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-              <History className="w-4 h-4" />
+            <TabsTrigger value="history" className="gap-1 sm:gap-2 text-xs sm:text-sm px-1 sm:px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              <History className="w-3 h-3 sm:w-4 sm:h-4" />
               <span className="hidden sm:inline">History</span>
             </TabsTrigger>
           </TabsList>

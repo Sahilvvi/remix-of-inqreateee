@@ -164,33 +164,33 @@ const BrandTemplates = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 p-6 space-y-8">
-      <div className="text-center space-y-4 max-w-3xl mx-auto">
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium">
-          <Palette className="w-4 h-4" />
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 p-3 sm:p-6 space-y-6 sm:space-y-8">
+      <div className="text-center space-y-3 sm:space-y-4 max-w-3xl mx-auto">
+        <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-primary/10 text-primary text-xs sm:text-sm font-medium">
+          <Palette className="w-3 h-3 sm:w-4 sm:h-4" />
           Content Template Library
         </div>
-        <h1 className="text-5xl font-bold bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent">
+        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent">
           Brand Templates
         </h1>
-        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+        <p className="text-sm sm:text-lg text-muted-foreground max-w-2xl mx-auto">
           Professional templates for all your content needs
         </p>
       </div>
 
       <Tabs defaultValue="browse" className="max-w-7xl mx-auto">
-        <TabsList className="grid w-full grid-cols-3 h-auto p-1 bg-muted/50 backdrop-blur-sm">
-          <TabsTrigger value="browse" className="gap-2">
-            <FileText className="w-4 h-4" />
-            Browse Templates
+        <TabsList className="grid w-full grid-cols-3 h-auto p-1 bg-muted/50 backdrop-blur-sm text-xs sm:text-sm">
+          <TabsTrigger value="browse" className="gap-1 sm:gap-2">
+            <FileText className="w-3 h-3 sm:w-4 sm:h-4" />
+            <span className="hidden sm:inline">Browse</span>
           </TabsTrigger>
-          <TabsTrigger value="create" className="gap-2">
-            <Sparkles className="w-4 h-4" />
-            Create Custom
+          <TabsTrigger value="create" className="gap-1 sm:gap-2">
+            <Sparkles className="w-3 h-3 sm:w-4 sm:h-4" />
+            <span className="hidden sm:inline">Create</span>
           </TabsTrigger>
-          <TabsTrigger value="saved" className="gap-2">
-            <History className="w-4 w-4" />
-            My Templates
+          <TabsTrigger value="saved" className="gap-1 sm:gap-2">
+            <History className="w-3 h-3 sm:w-4 w-4" />
+            <span className="hidden sm:inline">Saved</span>
           </TabsTrigger>
         </TabsList>
 
