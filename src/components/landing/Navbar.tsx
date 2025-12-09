@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Zap, Menu } from "lucide-react";
+import { Menu } from "lucide-react";
+import inqreateLogo from "@/assets/inqreate-logo.png";
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -31,12 +32,12 @@ const Navbar = () => {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#3B82F6] via-[#9333EA] to-[#EC4899] flex items-center justify-center group-hover:shadow-neon transition-all duration-300">
-              <Zap className="w-6 h-6 text-white" />
-            </div>
-            <span className="text-2xl font-bold bg-gradient-to-r from-[#3B82F6] via-[#9333EA] to-[#EC4899] bg-clip-text text-transparent">
-              Inqreate
-            </span>
+            <img 
+              src={inqreateLogo} 
+              alt="Inqreate Logo" 
+              className="h-10 w-auto object-contain group-hover:scale-105 transition-transform duration-300"
+              style={{ mixBlendMode: 'multiply' }}
+            />
           </Link>
 
           {/* Desktop Menu */}
