@@ -36,7 +36,6 @@ const Navbar = () => {
               src={inqreateLogo} 
               alt="Inqreate Logo" 
               className="h-10 w-auto object-contain group-hover:scale-105 transition-transform duration-300"
-              style={{ mixBlendMode: 'multiply' }}
             />
           </Link>
 

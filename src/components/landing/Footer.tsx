@@ -34,7 +34,7 @@ const Footer = () => {
               <img 
                 src={inqreateLogo} 
                 alt="Inqreate Logo" 
-                className="h-12 w-auto object-contain group-hover:scale-105 transition-transform duration-300 brightness-0 invert"
+                className="h-12 w-auto object-contain group-hover:scale-105 transition-transform duration-300"
               />
             </Link>
             <p className="text-[#9CA3AF] mb-6 max-w-sm">
