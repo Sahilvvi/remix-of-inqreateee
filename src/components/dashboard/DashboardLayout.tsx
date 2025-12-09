@@ -105,11 +105,6 @@ const DashboardLayout = ({ children, activeRoute, onRouteChange }: DashboardLayo
     <div className="min-h-screen bg-gradient-to-br from-background to-muted/30">
       {/* Mobile Header */}
       <header className="lg:hidden fixed top-0 left-0 right-0 h-14 sm:h-16 bg-card/95 backdrop-blur-md border-b z-50 flex items-center justify-between px-4">
-        <img 
-          src={inqreateLogo} 
-          alt="Inqreate Logo" 
-          className="h-7 sm:h-8 w-auto object-contain"
-        />
         <Button 
           variant="outline" 
           size="icon" 
@@ -118,6 +113,12 @@ const DashboardLayout = ({ children, activeRoute, onRouteChange }: DashboardLayo
         >
           <Menu className="w-5 h-5" />
         </Button>
+        <img 
+          src={inqreateLogo} 
+          alt="Inqreate Logo" 
+          className="h-7 sm:h-8 w-auto object-contain"
+        />
+        <div className="w-9 sm:w-10" /> {/* Spacer for centering logo */}
       </header>
 
       {/* Mobile Sidebar Overlay */}
@@ -129,11 +130,11 @@ const DashboardLayout = ({ children, activeRoute, onRouteChange }: DashboardLayo
         onClick={() => setSidebarOpen(false)}
       />
 
-      {/* Mobile Sidebar */}
+      {/* Mobile Sidebar - Left Side */}
       <aside 
         className={cn(
-          "lg:hidden fixed top-0 right-0 bottom-0 w-[280px] sm:w-[300px] bg-card border-l z-[70] p-5 sm:p-6 overflow-y-auto flex flex-col transition-transform duration-300 ease-out",
-          sidebarOpen ? "translate-x-0" : "translate-x-full"
+          "lg:hidden fixed top-0 left-0 bottom-0 w-[280px] sm:w-[300px] bg-card border-r z-[70] p-5 sm:p-6 overflow-y-auto flex flex-col transition-transform duration-300 ease-out",
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
         {/* Close Button */}
