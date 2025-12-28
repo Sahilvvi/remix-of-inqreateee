@@ -94,6 +94,12 @@ const Overview = () => {
         .select('*', { count: 'exact', head: true })
         .eq('user_id', user.id);
 
+      // Fetch e-commerce products count
+      const { count: productCount } = await supabase
+        .from('ecommerce_products')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id);
+
       const newStats: Stats = {
         totalBlogs,
         blogsThisWeek,
@@ -101,7 +107,7 @@ const Overview = () => {
         recentBlogs,
         socialPosts: socialCount || 0,
         seoAnalyses: seoCount || 0,
-        productListings: 0, // This would come from e-commerce data when available
+        productListings: productCount || 0,
       };
 
       setStats(newStats);
