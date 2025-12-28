@@ -24,19 +24,23 @@ const Analytics = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // Fetch counts for each content type
-      const [blogsRes, socialRes, productsRes, seoRes, postsPerf] = await Promise.all([
-        supabase.from('generated_blogs').select('*', { count: 'exact', head: true }).eq('user_id', user.id),
-        supabase.from('social_media_posts').select('*', { count: 'exact', head: true }).eq('user_id', user.id),
-        supabase.from('ecommerce_products').select('*', { count: 'exact', head: true }).eq('user_id', user.id),
-        supabase.from('seo_analyses').select('*', { count: 'exact', head: true }).eq('user_id', user.id),
-        supabase.from('post_performance').select('*').eq('user_id', user.id).order('posted_at', { ascending: false }).limit(50)
+      // Fetch all data with timestamps for historical tracking
+      const [blogsData, socialData, productsData, seoData] = await Promise.all([
+        supabase.from('generated_blogs').select('created_at').eq('user_id', user.id),
+        supabase.from('social_media_posts').select('created_at').eq('user_id', user.id),
+        supabase.from('ecommerce_products').select('created_at').eq('user_id', user.id),
+        supabase.from('seo_analyses').select('created_at').eq('user_id', user.id)
       ]);
 
-      setBlogCount(blogsRes.count || 0);
-      setSocialCount(socialRes.count || 0);
-      setProductCount(productsRes.count || 0);
-      setSeoCount(seoRes.count || 0);
+      const blogs = blogsData.data || [];
+      const social = socialData.data || [];
+      const products = productsData.data || [];
+      const seo = seoData.data || [];
+
+      setBlogCount(blogs.length);
+      setSocialCount(social.length);
+      setProductCount(products.length);
+      setSeoCount(seo.length);
 
       // Get recent activity
       const [recentBlogs, recentSocial, recentProducts, recentSeo] = await Promise.all([
@@ -55,8 +59,8 @@ const Analytics = () => {
 
       setRecentActivity(activities);
 
-      // Calculate monthly performance data
-      const monthlyData = calculateMonthlyData(postsPerf.data || []);
+      // Calculate real monthly performance data from actual timestamps
+      const monthlyData = calculateMonthlyData(blogs, social, products);
       setPerformanceData(monthlyData);
 
     } catch (error) {
@@ -66,19 +70,40 @@ const Analytics = () => {
     }
   };
 
-  const calculateMonthlyData = (performanceData: any[]) => {
+  const calculateMonthlyData = (blogs: any[], social: any[], products: any[]) => {
     const last6Months = Array.from({ length: 6 }, (_, i) => {
       const d = new Date();
       d.setMonth(d.getMonth() - (5 - i));
-      return d.toLocaleString('default', { month: 'short' });
+      return {
+        month: d.toLocaleString('default', { month: 'short' }),
+        year: d.getFullYear(),
+        monthNum: d.getMonth()
+      };
     });
 
-    return last6Months.map(month => ({
-      name: month,
-      blogs: Math.floor(Math.random() * 50) + blogCount / 6,
-      social: Math.floor(Math.random() * 100) + socialCount / 6,
-      products: Math.floor(Math.random() * 30) + productCount / 6,
-    }));
+    return last6Months.map(({ month, year, monthNum }) => {
+      const blogsInMonth = blogs.filter(b => {
+        const d = new Date(b.created_at);
+        return d.getMonth() === monthNum && d.getFullYear() === year;
+      }).length;
+
+      const socialInMonth = social.filter(s => {
+        const d = new Date(s.created_at);
+        return d.getMonth() === monthNum && d.getFullYear() === year;
+      }).length;
+
+      const productsInMonth = products.filter(p => {
+        const d = new Date(p.created_at);
+        return d.getMonth() === monthNum && d.getFullYear() === year;
+      }).length;
+
+      return {
+        name: month,
+        blogs: blogsInMonth,
+        social: socialInMonth,
+        products: productsInMonth,
+      };
+    });
   };
 
   const engagementData = [
