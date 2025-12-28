@@ -32,9 +32,16 @@ export const BlogHistory = ({ refreshTrigger }: BlogHistoryProps) => {
 
   const fetchBlogs = async () => {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+
       const { data, error } = await supabase
         .from("generated_blogs")
         .select("*")
+        .eq("user_id", user.id)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
@@ -52,6 +59,21 @@ export const BlogHistory = ({ refreshTrigger }: BlogHistoryProps) => {
 
   useEffect(() => {
     fetchBlogs();
+
+    const channel = supabase
+      .channel('blogs-history-changes')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'generated_blogs'
+      }, () => {
+        fetchBlogs();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [refreshTrigger]);
 
   const handleDelete = async (id: string) => {

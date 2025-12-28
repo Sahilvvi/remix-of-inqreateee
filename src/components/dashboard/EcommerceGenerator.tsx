@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Loader2, Copy, Download, Package, Image as ImageIcon, DollarSign, BarChart3, History, Eye, Trash2 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 
 const EcommerceGenerator = () => {
   const [productName, setProductName] = useState("");
@@ -28,13 +29,31 @@ const EcommerceGenerator = () => {
 
   useEffect(() => {
     fetchProducts();
+    
+    const channel = supabase
+      .channel('ecommerce-products-changes')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'ecommerce_products'
+      }, () => {
+        fetchProducts();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const fetchProducts = async () => {
     setIsLoadingHistory(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      if (!user) {
+        setIsLoadingHistory(false);
+        return;
+      }
 
       const { data, error } = await supabase
         .from('ecommerce_products')
@@ -444,7 +463,7 @@ const EcommerceGenerator = () => {
         </TabsContent>
 
         <TabsContent value="preview" className="mt-6">
-          {!productData ? (
+          {!productData && products.length === 0 ? (
             <Card className="glass-effect">
               <CardContent className="py-12 text-center text-muted-foreground">
                 Generate product content to see preview
@@ -453,53 +472,81 @@ const EcommerceGenerator = () => {
           ) : (
             <Card className="glass-effect">
               <CardHeader>
-                <CardTitle>Product Preview</CardTitle>
-                <CardDescription>How your product will appear</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {imageUrl && (
-                  <div className="w-full h-64 rounded-lg overflow-hidden bg-muted/30">
-                    <img 
-                      src={imageUrl} 
-                      alt={productData.title} 
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        e.currentTarget.src = 'https://via.placeholder.com/400x300?text=Product+Image';
-                      }}
-                    />
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle>Product Preview</CardTitle>
+                    <CardDescription>How your product will appear</CardDescription>
                   </div>
-                )}
-                <div>
-                  <h2 className="text-2xl font-bold mb-2">{productData.title}</h2>
-                  {price && (
-                    <p className="text-3xl font-bold text-primary mb-4">${price}</p>
-                  )}
-                  <p className="text-muted-foreground mb-4">{productData.description}</p>
-                  
-                  {productData.sellingPoints && productData.sellingPoints.length > 0 && (
-                    <div className="mb-4">
-                      <h3 className="font-semibold mb-2">Key Features:</h3>
-                      <ul className="space-y-2">
-                        {productData.sellingPoints.map((point: string, index: number) => (
-                          <li key={index} className="flex items-start">
-                            <span className="mr-2">✓</span>
-                            <span>{point}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-
-                  {sku && (
-                    <p className="text-sm text-muted-foreground">SKU: {sku}</p>
-                  )}
-                  
-                  {inventory && (
-                    <p className="text-sm text-muted-foreground">
-                      Stock: {inventory} units available
-                    </p>
+                  {!productData && products.length > 0 && (
+                    <Badge variant="outline" className="text-xs">
+                      Showing last saved product
+                    </Badge>
                   )}
                 </div>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {(() => {
+                  const displayProduct = productData || (products.length > 0 ? {
+                    title: products[0].title,
+                    description: products[0].description,
+                    sellingPoints: products[0].selling_points,
+                    metaDescription: products[0].meta_description,
+                  } : null);
+                  const displayImage = imageUrl || products[0]?.image_url;
+                  const displayPrice = price || products[0]?.price;
+                  const displaySku = sku || products[0]?.sku;
+                  const displayInventory = inventory || products[0]?.inventory_count;
+
+                  if (!displayProduct) return null;
+
+                  return (
+                    <>
+                      {displayImage && (
+                        <div className="w-full h-64 rounded-lg overflow-hidden bg-muted/30">
+                          <img 
+                            src={displayImage} 
+                            alt={displayProduct.title} 
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              e.currentTarget.src = 'https://via.placeholder.com/400x300?text=Product+Image';
+                            }}
+                          />
+                        </div>
+                      )}
+                      <div>
+                        <h2 className="text-2xl font-bold mb-2">{displayProduct.title}</h2>
+                        {displayPrice && (
+                          <p className="text-3xl font-bold text-primary mb-4">${displayPrice}</p>
+                        )}
+                        <p className="text-muted-foreground mb-4">{displayProduct.description}</p>
+                        
+                        {displayProduct.sellingPoints && displayProduct.sellingPoints.length > 0 && (
+                          <div className="mb-4">
+                            <h3 className="font-semibold mb-2">Key Features:</h3>
+                            <ul className="space-y-2">
+                              {displayProduct.sellingPoints.map((point: string, index: number) => (
+                                <li key={index} className="flex items-start">
+                                  <span className="mr-2">✓</span>
+                                  <span>{point}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+
+                        {displaySku && (
+                          <p className="text-sm text-muted-foreground">SKU: {displaySku}</p>
+                        )}
+                        
+                        {displayInventory && (
+                          <p className="text-sm text-muted-foreground">
+                            Stock: {displayInventory} units available
+                          </p>
+                        )}
+                      </div>
+                    </>
+                  );
+                })()}
               </CardContent>
             </Card>
           )}

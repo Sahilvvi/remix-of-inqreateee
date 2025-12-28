@@ -1,9 +1,9 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Copy, Download, Save, CheckCircle2 } from "lucide-react";
+import { Copy, Download, Save, CheckCircle2, RefreshCw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 
 interface BlogPreviewProps {
@@ -16,6 +16,19 @@ interface BlogPreviewProps {
   wordCount: string;
   imagePrompt?: string;
   onSaved?: () => void;
+}
+
+interface SavedBlog {
+  id: string;
+  title: string;
+  content: string;
+  topic: string;
+  keywords: string | null;
+  tone: string;
+  language: string;
+  word_count: number;
+  image_url: string | null;
+  created_at: string;
 }
 
 export const BlogPreview = ({
@@ -31,9 +44,41 @@ export const BlogPreview = ({
 }: BlogPreviewProps) => {
   const { toast } = useToast();
   const [saving, setSaving] = useState(false);
+  const [latestSaved, setLatestSaved] = useState<SavedBlog | null>(null);
+  const [loadingSaved, setLoadingSaved] = useState(true);
+
+  useEffect(() => {
+    fetchLatestSaved();
+  }, []);
+
+  const fetchLatestSaved = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from("generated_blogs")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (!error && data) {
+        setLatestSaved(data);
+      }
+    } catch (error) {
+      console.error("Error fetching latest blog:", error);
+    } finally {
+      setLoadingSaved(false);
+    }
+  };
 
   const handleCopy = () => {
-    const fullContent = `${imageUrl ? `![${topic}](${imageUrl})\n\n` : ''}${content}`;
+    const displayContent = content || latestSaved?.content || "";
+    const displayImage = imageUrl || latestSaved?.image_url || "";
+    const displayTopic = topic || latestSaved?.topic || "";
+    const fullContent = `${displayImage ? `![${displayTopic}](${displayImage})\n\n` : ''}${displayContent}`;
     navigator.clipboard.writeText(fullContent);
     toast({
       title: "Copied!",
@@ -42,11 +87,14 @@ export const BlogPreview = ({
   };
 
   const handleDownload = () => {
-    const fullContent = `# ${topic}\n\n${imageUrl ? `![${topic}](${imageUrl})\n\n` : ''}${content}`;
+    const displayContent = content || latestSaved?.content || "";
+    const displayTopic = topic || latestSaved?.topic || "";
+    const displayImage = imageUrl || latestSaved?.image_url || "";
+    const fullContent = `# ${displayTopic}\n\n${displayImage ? `![${displayTopic}](${displayImage})\n\n` : ''}${displayContent}`;
     const element = document.createElement("a");
     const file = new Blob([fullContent], { type: "text/markdown" });
     element.href = URL.createObjectURL(file);
-    element.download = `${topic.toLowerCase().replace(/\s+/g, "-")}.md`;
+    element.download = `${displayTopic.toLowerCase().replace(/\s+/g, "-")}.md`;
     document.body.appendChild(element);
     element.click();
     document.body.removeChild(element);
@@ -57,6 +105,15 @@ export const BlogPreview = ({
   };
 
   const handleSave = async () => {
+    if (!content) {
+      toast({
+        title: "Nothing to save",
+        description: "Generate content first before saving.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setSaving(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -82,6 +139,7 @@ export const BlogPreview = ({
         description: "Blog post saved to your history.",
       });
       onSaved?.();
+      fetchLatestSaved();
     } catch (error: any) {
       toast({
         title: "Error",
@@ -93,7 +151,17 @@ export const BlogPreview = ({
     }
   };
 
-  if (!content) {
+  // Use current content or fallback to latest saved
+  const displayContent = content || latestSaved?.content || "";
+  const displayTopic = topic || latestSaved?.topic || "";
+  const displayImage = imageUrl || latestSaved?.image_url || "";
+  const displayTone = tone || latestSaved?.tone || "";
+  const displayLanguage = language || latestSaved?.language || "";
+  const displayWordCount = content ? wordCount : (latestSaved?.word_count?.toString() || "");
+  const displayKeywords = keywords || latestSaved?.keywords || "";
+  const isShowingSaved = !content && latestSaved;
+
+  if (!displayContent && !loadingSaved) {
     return (
       <Card className="p-16 text-center border-2 border-dashed">
         <div className="space-y-4">
@@ -109,47 +177,65 @@ export const BlogPreview = ({
     );
   }
 
+  if (loadingSaved && !content) {
+    return (
+      <Card className="p-16 text-center">
+        <div className="w-16 h-16 border-4 border-primary/30 border-t-primary rounded-full animate-spin mx-auto" />
+        <p className="mt-4 text-muted-foreground">Loading preview...</p>
+      </Card>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Action Buttons */}
-      <div className="flex flex-wrap gap-3 justify-end">
-        <Button variant="outline" size="lg" onClick={handleCopy} className="gap-2">
-          <Copy className="w-4 h-4" />
-          Copy
-        </Button>
-        <Button variant="outline" size="lg" onClick={handleDownload} className="gap-2">
-          <Download className="w-4 h-4" />
-          Download
-        </Button>
-        <Button size="lg" onClick={handleSave} disabled={saving} className="gap-2">
-          <Save className="w-4 h-4" />
-          {saving ? "Saving..." : "Save to History"}
-        </Button>
+      <div className="flex flex-wrap gap-3 justify-between items-center">
+        {isShowingSaved && (
+          <Badge variant="outline" className="text-sm">
+            Showing last saved post
+          </Badge>
+        )}
+        <div className="flex flex-wrap gap-3 ml-auto">
+          <Button variant="outline" size="lg" onClick={handleCopy} className="gap-2">
+            <Copy className="w-4 h-4" />
+            Copy
+          </Button>
+          <Button variant="outline" size="lg" onClick={handleDownload} className="gap-2">
+            <Download className="w-4 h-4" />
+            Download
+          </Button>
+          {content && (
+            <Button size="lg" onClick={handleSave} disabled={saving} className="gap-2">
+              <Save className="w-4 h-4" />
+              {saving ? "Saving..." : "Save to History"}
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Preview Card */}
       <Card className="border-2 shadow-lg overflow-hidden">
         <CardHeader className="space-y-4 bg-gradient-to-br from-primary/5 to-primary/10">
           <div className="flex flex-wrap gap-2">
-            <Badge variant="secondary" className="text-sm">{tone}</Badge>
-            <Badge variant="secondary" className="text-sm">{language}</Badge>
-            <Badge variant="secondary" className="text-sm">{wordCount} words</Badge>
+            <Badge variant="secondary" className="text-sm">{displayTone}</Badge>
+            <Badge variant="secondary" className="text-sm">{displayLanguage}</Badge>
+            <Badge variant="secondary" className="text-sm">{displayWordCount} words</Badge>
           </div>
-          <CardTitle className="text-3xl">{topic}</CardTitle>
-          {keywords && (
+          <CardTitle className="text-3xl">{displayTopic}</CardTitle>
+          {displayKeywords && (
             <CardDescription className="text-base">
-              Keywords: {keywords}
+              Keywords: {displayKeywords}
             </CardDescription>
           )}
         </CardHeader>
         <CardContent className="space-y-6 p-8">
-          {imageUrl && (
+          {displayImage && (
             <div className="rounded-xl overflow-hidden shadow-xl">
-              <img src={imageUrl} alt={topic} className="w-full" />
+              <img src={displayImage} alt={displayTopic} className="w-full" />
             </div>
           )}
           <div className="prose prose-lg max-w-none dark:prose-invert">
-            <div className="whitespace-pre-wrap leading-relaxed">{content}</div>
+            <div className="whitespace-pre-wrap leading-relaxed">{displayContent}</div>
           </div>
         </CardContent>
       </Card>
