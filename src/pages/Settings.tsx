@@ -9,46 +9,123 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { User, Bell, Shield, CreditCard, Globe, Moon, Sun, Key, Database, Zap } from "lucide-react";
+import { User, Bell, Shield, CreditCard, Globe, Moon, Sun, Key, Database, Zap, Loader2 } from "lucide-react";
+
+interface UserSettings {
+  display_name: string;
+  email_notifications: boolean;
+  push_notifications: boolean;
+  weekly_reports: boolean;
+  content_alerts: boolean;
+  theme: string;
+  language: string;
+  timezone: string;
+  default_tone: string;
+  default_word_count: number;
+  auto_save: boolean;
+}
+
+const defaultSettings: UserSettings = {
+  display_name: "",
+  email_notifications: true,
+  push_notifications: false,
+  weekly_reports: true,
+  content_alerts: true,
+  theme: "system",
+  language: "en",
+  timezone: "UTC",
+  default_tone: "professional",
+  default_word_count: 800,
+  auto_save: true,
+};
 
 const Settings = () => {
   const { toast } = useToast();
   const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(false);
-  
-  // Profile Settings
-  const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
-  
-  // Notification Settings
-  const [emailNotifications, setEmailNotifications] = useState(true);
-  const [pushNotifications, setPushNotifications] = useState(false);
-  const [weeklyReports, setWeeklyReports] = useState(true);
-  const [contentAlerts, setContentAlerts] = useState(true);
-  
-  // Appearance Settings
-  const [theme, setTheme] = useState("system");
-  const [language, setLanguage] = useState("en");
-  const [timezone, setTimezone] = useState("UTC");
-  
-  // Content Settings
-  const [defaultTone, setDefaultTone] = useState("professional");
-  const [defaultWordCount, setDefaultWordCount] = useState("800");
-  const [autoSave, setAutoSave] = useState(true);
-  
-  // API Settings
-  const [apiKeyVisible, setApiKeyVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [settings, setSettings] = useState<UserSettings>(defaultSettings);
 
   useEffect(() => {
     loadUserData();
   }, []);
 
   const loadUserData = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
-      setUser(user);
-      setEmail(user.email || "");
-      setDisplayName(user.user_metadata?.display_name || "");
+    setInitialLoading(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        setUser(user);
+        setEmail(user.email || "");
+
+        // Load settings from database
+        const { data: settingsData, error } = await supabase
+          .from('user_settings')
+          .select('*')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        if (error) {
+          console.error('Error loading settings:', error);
+        }
+
+        if (settingsData) {
+          setSettings({
+            display_name: settingsData.display_name || "",
+            email_notifications: settingsData.email_notifications ?? true,
+            push_notifications: settingsData.push_notifications ?? false,
+            weekly_reports: settingsData.weekly_reports ?? true,
+            content_alerts: settingsData.content_alerts ?? true,
+            theme: settingsData.theme || "system",
+            language: settingsData.language || "en",
+            timezone: settingsData.timezone || "UTC",
+            default_tone: settingsData.default_tone || "professional",
+            default_word_count: settingsData.default_word_count || 800,
+            auto_save: settingsData.auto_save ?? true,
+          });
+        } else {
+          // Use metadata as fallback for display name
+          setSettings(prev => ({
+            ...prev,
+            display_name: user.user_metadata?.display_name || "",
+          }));
+        }
+      }
+    } catch (error) {
+      console.error('Error loading user data:', error);
+    } finally {
+      setInitialLoading(false);
+    }
+  };
+
+  const saveSettings = async (updatedSettings: Partial<UserSettings>) => {
+    if (!user) return;
+
+    const newSettings = { ...settings, ...updatedSettings };
+    setSettings(newSettings);
+
+    try {
+      const { error } = await supabase
+        .from('user_settings')
+        .upsert({
+          user_id: user.id,
+          ...newSettings,
+        }, { onConflict: 'user_id' });
+
+      if (error) throw error;
+
+      toast({
+        title: "Settings saved",
+        description: "Your preferences have been updated.",
+      });
+    } catch (error: any) {
+      console.error('Error saving settings:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save settings.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -56,10 +133,12 @@ const Settings = () => {
     setLoading(true);
     try {
       const { error } = await supabase.auth.updateUser({
-        data: { display_name: displayName }
+        data: { display_name: settings.display_name }
       });
 
       if (error) throw error;
+
+      await saveSettings({ display_name: settings.display_name });
 
       toast({
         title: "Success",
@@ -97,6 +176,14 @@ const Settings = () => {
       setLoading(false);
     }
   };
+
+  if (initialLoading) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4 sm:space-y-6">
@@ -145,8 +232,8 @@ const Settings = () => {
                 <Label htmlFor="displayName">Display Name</Label>
                 <Input
                   id="displayName"
-                  value={displayName}
-                  onChange={(e) => setDisplayName(e.target.value)}
+                  value={settings.display_name}
+                  onChange={(e) => setSettings(prev => ({ ...prev, display_name: e.target.value }))}
                   placeholder="Your name"
                 />
               </div>
@@ -181,8 +268,8 @@ const Settings = () => {
                   <p className="text-sm text-muted-foreground">Receive notifications via email</p>
                 </div>
                 <Switch
-                  checked={emailNotifications}
-                  onCheckedChange={setEmailNotifications}
+                  checked={settings.email_notifications}
+                  onCheckedChange={(checked) => saveSettings({ email_notifications: checked })}
                 />
               </div>
               <Separator />
@@ -192,8 +279,8 @@ const Settings = () => {
                   <p className="text-sm text-muted-foreground">Receive push notifications</p>
                 </div>
                 <Switch
-                  checked={pushNotifications}
-                  onCheckedChange={setPushNotifications}
+                  checked={settings.push_notifications}
+                  onCheckedChange={(checked) => saveSettings({ push_notifications: checked })}
                 />
               </div>
               <Separator />
@@ -203,8 +290,8 @@ const Settings = () => {
                   <p className="text-sm text-muted-foreground">Get weekly analytics reports</p>
                 </div>
                 <Switch
-                  checked={weeklyReports}
-                  onCheckedChange={setWeeklyReports}
+                  checked={settings.weekly_reports}
+                  onCheckedChange={(checked) => saveSettings({ weekly_reports: checked })}
                 />
               </div>
               <Separator />
@@ -214,8 +301,8 @@ const Settings = () => {
                   <p className="text-sm text-muted-foreground">Alerts for content generation</p>
                 </div>
                 <Switch
-                  checked={contentAlerts}
-                  onCheckedChange={setContentAlerts}
+                  checked={settings.content_alerts}
+                  onCheckedChange={(checked) => saveSettings({ content_alerts: checked })}
                 />
               </div>
             </CardContent>
@@ -263,7 +350,10 @@ const Settings = () => {
             <CardContent className="space-y-6">
               <div className="space-y-2">
                 <Label>Theme</Label>
-                <Select value={theme} onValueChange={setTheme}>
+                <Select 
+                  value={settings.theme} 
+                  onValueChange={(value) => saveSettings({ theme: value })}
+                >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -286,7 +376,10 @@ const Settings = () => {
               </div>
               <div className="space-y-2">
                 <Label>Language</Label>
-                <Select value={language} onValueChange={setLanguage}>
+                <Select 
+                  value={settings.language} 
+                  onValueChange={(value) => saveSettings({ language: value })}
+                >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -300,7 +393,10 @@ const Settings = () => {
               </div>
               <div className="space-y-2">
                 <Label>Timezone</Label>
-                <Select value={timezone} onValueChange={setTimezone}>
+                <Select 
+                  value={settings.timezone} 
+                  onValueChange={(value) => saveSettings({ timezone: value })}
+                >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -326,7 +422,10 @@ const Settings = () => {
             <CardContent className="space-y-6">
               <div className="space-y-2">
                 <Label>Default Tone</Label>
-                <Select value={defaultTone} onValueChange={setDefaultTone}>
+                <Select 
+                  value={settings.default_tone} 
+                  onValueChange={(value) => saveSettings({ default_tone: value })}
+                >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -340,7 +439,10 @@ const Settings = () => {
               </div>
               <div className="space-y-2">
                 <Label>Default Word Count</Label>
-                <Select value={defaultWordCount} onValueChange={setDefaultWordCount}>
+                <Select 
+                  value={settings.default_word_count.toString()} 
+                  onValueChange={(value) => saveSettings({ default_word_count: parseInt(value) })}
+                >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -358,7 +460,10 @@ const Settings = () => {
                   <Label>Auto-Save</Label>
                   <p className="text-sm text-muted-foreground">Automatically save your work</p>
                 </div>
-                <Switch checked={autoSave} onCheckedChange={setAutoSave} />
+                <Switch 
+                  checked={settings.auto_save} 
+                  onCheckedChange={(checked) => saveSettings({ auto_save: checked })} 
+                />
               </div>
             </CardContent>
           </Card>
