@@ -12,6 +12,12 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, Upload, Instagram, Facebook, Twitter, Linkedin, Youtube, Calendar, BarChart3, LinkIcon, Eye } from "lucide-react";
 
+interface PostingStats {
+  thisMonth: number;
+  posted: number;
+  pending: number;
+}
+
 const AutoPosting = () => {
   const [platform, setPlatform] = useState("instagram");
   const [content, setContent] = useState("");
@@ -22,11 +28,13 @@ const AutoPosting = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [connectedAccounts, setConnectedAccounts] = useState<any[]>([]);
   const [isConnecting, setIsConnecting] = useState(false);
+  const [postingStats, setPostingStats] = useState<PostingStats>({ thisMonth: 0, posted: 0, pending: 0 });
   const { toast } = useToast();
 
   useEffect(() => {
     fetchScheduledPosts();
     fetchConnectedAccounts();
+    fetchPostingStats();
   }, []);
 
   const fetchConnectedAccounts = async () => {
@@ -44,6 +52,35 @@ const AutoPosting = () => {
       setConnectedAccounts(data || []);
     } catch (error) {
       console.error('Error fetching connected accounts:', error);
+    }
+  };
+
+  const fetchPostingStats = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // Get start of current month
+      const startOfMonth = new Date();
+      startOfMonth.setDate(1);
+      startOfMonth.setHours(0, 0, 0, 0);
+
+      const { data, error } = await supabase
+        .from('scheduled_posts')
+        .select('status, created_at')
+        .eq('user_id', user.id)
+        .gte('created_at', startOfMonth.toISOString());
+
+      if (error) throw error;
+
+      const posts = data || [];
+      const thisMonth = posts.length;
+      const posted = posts.filter(p => p.status === 'posted').length;
+      const pending = posts.filter(p => p.status === 'pending').length;
+
+      setPostingStats({ thisMonth, posted, pending });
+    } catch (error) {
+      console.error('Error fetching posting stats:', error);
     }
   };
 
@@ -427,15 +464,15 @@ const AutoPosting = () => {
             <CardContent>
               <div className="grid md:grid-cols-3 gap-4">
                 <div className="p-4 rounded-lg bg-blue-500/10 border border-blue-500/20">
-                  <p className="text-2xl font-bold text-blue-500">24</p>
+                  <p className="text-2xl font-bold text-blue-500">{postingStats.thisMonth}</p>
                   <p className="text-sm text-muted-foreground">Posts This Month</p>
                 </div>
                 <div className="p-4 rounded-lg bg-green-500/10 border border-green-500/20">
-                  <p className="text-2xl font-bold text-green-500">18</p>
+                  <p className="text-2xl font-bold text-green-500">{postingStats.posted}</p>
                   <p className="text-sm text-muted-foreground">Successfully Posted</p>
                 </div>
                 <div className="p-4 rounded-lg bg-orange-500/10 border border-orange-500/20">
-                  <p className="text-2xl font-bold text-orange-500">6</p>
+                  <p className="text-2xl font-bold text-orange-500">{postingStats.pending}</p>
                   <p className="text-sm text-muted-foreground">Scheduled</p>
                 </div>
               </div>

@@ -470,6 +470,60 @@ export type Database = {
         }
         Relationships: []
       }
+      user_settings: {
+        Row: {
+          auto_save: boolean | null
+          content_alerts: boolean | null
+          created_at: string
+          default_tone: string | null
+          default_word_count: number | null
+          display_name: string | null
+          email_notifications: boolean | null
+          id: string
+          language: string | null
+          push_notifications: boolean | null
+          theme: string | null
+          timezone: string | null
+          updated_at: string
+          user_id: string
+          weekly_reports: boolean | null
+        }
+        Insert: {
+          auto_save?: boolean | null
+          content_alerts?: boolean | null
+          created_at?: string
+          default_tone?: string | null
+          default_word_count?: number | null
+          display_name?: string | null
+          email_notifications?: boolean | null
+          id?: string
+          language?: string | null
+          push_notifications?: boolean | null
+          theme?: string | null
+          timezone?: string | null
+          updated_at?: string
+          user_id: string
+          weekly_reports?: boolean | null
+        }
+        Update: {
+          auto_save?: boolean | null
+          content_alerts?: boolean | null
+          created_at?: string
+          default_tone?: string | null
+          default_word_count?: number | null
+          display_name?: string | null
+          email_notifications?: boolean | null
+          id?: string
+          language?: string | null
+          push_notifications?: boolean | null
+          theme?: string | null
+          timezone?: string | null
+          updated_at?: string
+          user_id?: string
+          weekly_reports?: boolean | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

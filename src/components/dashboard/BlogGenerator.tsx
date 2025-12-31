@@ -46,9 +46,37 @@ const BlogGenerator = () => {
 
       if (data?.blog) {
         setGeneratedBlog(data.blog);
+        
+        // Auto-save to database
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          // Extract title from the generated blog (first line usually)
+          const lines = data.blog.split('\n');
+          const extractedTitle = lines[0]?.replace(/^#\s*/, '').trim() || topic;
+          
+          const { error: saveError } = await supabase.from('generated_blogs').insert({
+            user_id: user.id,
+            topic,
+            title: extractedTitle,
+            content: data.blog,
+            keywords,
+            tone,
+            language,
+            word_count: parseInt(wordCount),
+            image_url: imageUrl || null,
+            image_prompt: imagePrompt || null,
+          });
+
+          if (saveError) {
+            console.error('Error auto-saving blog:', saveError);
+          } else {
+            setHistoryRefresh((prev) => prev + 1);
+          }
+        }
+        
         toast({
           title: "Success!",
-          description: "Your blog post has been generated.",
+          description: "Your blog post has been generated and saved.",
         });
       }
     } catch (error: any) {
