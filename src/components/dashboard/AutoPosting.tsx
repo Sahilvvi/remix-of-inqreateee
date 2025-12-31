@@ -35,6 +35,29 @@ const AutoPosting = () => {
     fetchScheduledPosts();
     fetchConnectedAccounts();
     fetchPostingStats();
+
+    // Set up real-time subscription for scheduled_posts
+    const channel = supabase
+      .channel('scheduled-posts-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'scheduled_posts'
+        },
+        (payload) => {
+          console.log('Real-time update:', payload);
+          // Refetch data when changes occur
+          fetchScheduledPosts();
+          fetchPostingStats();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const fetchConnectedAccounts = async () => {

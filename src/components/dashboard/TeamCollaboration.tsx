@@ -133,12 +133,22 @@ const TeamCollaboration = () => {
 
       if (error) throw error;
 
-      // Fetch user emails for each member using auth admin (requires service role)
-      // For now, we'll use user_id as display since we can't access auth.users from client
-      const membersWithEmails = (data || []).map((member) => ({
-        ...member,
-        user_email: member.user_id, // Will show UUID until we add profiles table
-      }));
+      // Fetch user emails from profiles table
+      const memberUserIds = (data || []).map(m => m.user_id);
+      const { data: profiles } = await supabase
+        .from("profiles")
+        .select("id, email, full_name")
+        .in("id", memberUserIds);
+
+      const profileMap = new Map(profiles?.map(p => [p.id, p]) || []);
+
+      const membersWithEmails = (data || []).map((member) => {
+        const profile = profileMap.get(member.user_id);
+        return {
+          ...member,
+          user_email: profile?.email || profile?.full_name || member.user_id.slice(0, 8) + '...',
+        };
+      });
 
       setMembers(membersWithEmails);
     } catch (error: any) {
