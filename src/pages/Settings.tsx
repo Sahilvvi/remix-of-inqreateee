@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,9 +7,10 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { User, Bell, Shield, CreditCard, Globe, Moon, Sun, Key, Database, Zap, Loader2 } from "lucide-react";
+import { User, Bell, Shield, CreditCard, Globe, Moon, Sun, Key, Database, Zap, Loader2, Camera, Upload } from "lucide-react";
 
 interface UserSettings {
   display_name: string;
@@ -46,6 +47,9 @@ const Settings = () => {
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
   const [settings, setSettings] = useState<UserSettings>(defaultSettings);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     loadUserData();
@@ -58,6 +62,20 @@ const Settings = () => {
       if (user) {
         setUser(user);
         setEmail(user.email || "");
+
+        // Load profile data (including avatar)
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .maybeSingle();
+
+        if (profileData) {
+          setAvatarUrl(profileData.avatar_url);
+          if (profileData.full_name) {
+            setSettings(prev => ({ ...prev, display_name: profileData.full_name || "" }));
+          }
+        }
 
         // Load settings from database
         const { data: settingsData, error } = await supabase
@@ -72,7 +90,7 @@ const Settings = () => {
 
         if (settingsData) {
           setSettings({
-            display_name: settingsData.display_name || "",
+            display_name: settingsData.display_name || profileData?.full_name || "",
             email_notifications: settingsData.email_notifications ?? true,
             push_notifications: settingsData.push_notifications ?? false,
             weekly_reports: settingsData.weekly_reports ?? true,
@@ -88,7 +106,7 @@ const Settings = () => {
           // Use metadata as fallback for display name
           setSettings(prev => ({
             ...prev,
-            display_name: user.user_metadata?.display_name || "",
+            display_name: user.user_metadata?.display_name || profileData?.full_name || "",
           }));
         }
       }
@@ -129,6 +147,76 @@ const Settings = () => {
     }
   };
 
+  const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !user) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "Invalid file type",
+        description: "Please upload an image file",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: "File too large",
+        description: "Please upload an image smaller than 5MB",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setUploadingAvatar(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const filePath = `${user.id}/avatar.${fileExt}`;
+
+      // Upload to storage
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+
+      // Update profile with new avatar URL
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .upsert({ 
+          id: user.id, 
+          avatar_url: publicUrl,
+          email: user.email,
+          full_name: settings.display_name || null
+        });
+
+      if (updateError) throw updateError;
+
+      setAvatarUrl(publicUrl);
+      toast({
+        title: "Success",
+        description: "Avatar updated successfully",
+      });
+    } catch (error: any) {
+      console.error('Avatar upload error:', error);
+      toast({
+        title: "Error uploading avatar",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setUploadingAvatar(false);
+    }
+  };
+
   const handleSaveProfile = async () => {
     setLoading(true);
     try {
@@ -137,6 +225,16 @@ const Settings = () => {
       });
 
       if (error) throw error;
+
+      // Also update profiles table
+      await supabase
+        .from('profiles')
+        .upsert({ 
+          id: user.id, 
+          full_name: settings.display_name,
+          email: user.email,
+          avatar_url: avatarUrl
+        });
 
       await saveSettings({ display_name: settings.display_name });
 
@@ -225,9 +323,56 @@ const Settings = () => {
           <Card>
             <CardHeader>
               <CardTitle>Profile Information</CardTitle>
-              <CardDescription>Update your personal details</CardDescription>
+              <CardDescription>Update your personal details and avatar</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-6">
+              {/* Avatar Section */}
+              <div className="flex flex-col sm:flex-row items-center gap-4">
+                <div className="relative group">
+                  <Avatar className="h-24 w-24 border-4 border-primary/20">
+                    <AvatarImage src={avatarUrl || undefined} alt="Profile avatar" />
+                    <AvatarFallback className="text-2xl bg-gradient-to-br from-primary to-secondary text-primary-foreground">
+                      {settings.display_name?.charAt(0)?.toUpperCase() || email?.charAt(0)?.toUpperCase() || 'U'}
+                    </AvatarFallback>
+                  </Avatar>
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={uploadingAvatar}
+                    className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                  >
+                    {uploadingAvatar ? (
+                      <Loader2 className="h-6 w-6 text-white animate-spin" />
+                    ) : (
+                      <Camera className="h-6 w-6 text-white" />
+                    )}
+                  </button>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleAvatarUpload}
+                    className="hidden"
+                  />
+                </div>
+                <div className="text-center sm:text-left">
+                  <h3 className="font-medium">Profile Photo</h3>
+                  <p className="text-sm text-muted-foreground mb-2">
+                    Click the avatar to upload a new photo
+                  </p>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={uploadingAvatar}
+                  >
+                    <Upload className="h-4 w-4 mr-2" />
+                    {uploadingAvatar ? "Uploading..." : "Upload Photo"}
+                  </Button>
+                </div>
+              </div>
+
+              <Separator />
+
               <div className="space-y-2">
                 <Label htmlFor="displayName">Display Name</Label>
                 <Input
