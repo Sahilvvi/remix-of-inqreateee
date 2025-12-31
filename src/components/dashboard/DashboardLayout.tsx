@@ -16,12 +16,14 @@ import {
   Users,
   Menu,
   X,
+  Shield,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import inqreateLogo from "@/assets/inqreate-logo.png";
 import { useToast } from "@/hooks/use-toast";
+import { useAdminAuth } from "@/hooks/useAdminAuth";
 import { cn } from "@/lib/utils";
-
+import { Badge } from "@/components/ui/badge";
 interface DashboardLayoutProps {
   children: ReactNode;
   activeRoute: string;
@@ -34,6 +36,7 @@ const DashboardLayout = ({ children, activeRoute, onRouteChange }: DashboardLayo
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { isAdmin } = useAdminAuth();
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -179,6 +182,16 @@ const DashboardLayout = ({ children, activeRoute, onRouteChange }: DashboardLayo
 
         {/* Bottom Actions */}
         <div className="mt-6 pt-6 border-t space-y-1.5">
+          {isAdmin && (
+            <button
+              onClick={() => navigate('/admin')}
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-red-500/10 text-red-500 hover:bg-red-500/20 transition-all duration-200 text-sm font-medium"
+            >
+              <Shield className="w-5 h-5 shrink-0" />
+              <span>Admin Panel</span>
+              <Badge className="ml-auto bg-red-500 text-white text-[10px]">Admin</Badge>
+            </button>
+          )}
           <button
             onClick={() => handleRouteChange("settings")}
             className={cn(
@@ -234,6 +247,16 @@ const DashboardLayout = ({ children, activeRoute, onRouteChange }: DashboardLayo
         </nav>
 
         <div className="mt-6 pt-6 border-t space-y-1.5">
+          {isAdmin && (
+            <button
+              onClick={() => navigate('/admin')}
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-red-500/10 text-red-500 hover:bg-red-500/20 transition-all duration-200 text-sm font-medium"
+            >
+              <Shield className="w-5 h-5 shrink-0" />
+              <span>Admin Panel</span>
+              <Badge className="ml-auto bg-red-500 text-white text-[10px]">Admin</Badge>
+            </button>
+          )}
           <button
             onClick={() => handleRouteChange("settings")}
             className={cn(
