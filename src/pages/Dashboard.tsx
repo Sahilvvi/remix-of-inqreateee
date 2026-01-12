@@ -9,6 +9,8 @@ import BrandTemplates from "@/components/dashboard/BrandTemplates";
 import EcommerceGenerator from "@/components/dashboard/EcommerceGenerator";
 import Analytics from "@/components/dashboard/Analytics";
 import TeamCollaboration from "@/components/dashboard/TeamCollaboration";
+import BrandKitTeams from "@/components/dashboard/BrandKitTeams";
+import EcommerceContentTools from "@/components/dashboard/EcommerceContentTools";
 import Settings from "@/pages/Settings";
 import { Card } from "@/components/ui/card";
 
@@ -42,6 +44,10 @@ const Dashboard = () => {
         return <BrandTemplates />;
       case "ecommerce":
         return <EcommerceGenerator />;
+      case "ecommerce-tools":
+        return <EcommerceContentTools />;
+      case "brand-kit":
+        return <BrandKitTeams />;
       case "analytics":
         return <Analytics />;
       case "team":

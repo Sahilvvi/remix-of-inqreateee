@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      brand_assets: {
+        Row: {
+          body_font: string | null
+          brand_colors: Json | null
+          created_at: string
+          heading_font: string | null
+          id: string
+          logo_url: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          body_font?: string | null
+          brand_colors?: Json | null
+          created_at?: string
+          heading_font?: string | null
+          id?: string
+          logo_url?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          body_font?: string | null
+          brand_colors?: Json | null
+          created_at?: string
+          heading_font?: string | null
+          id?: string
+          logo_url?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       brand_templates: {
         Row: {
           category: string
@@ -43,6 +76,59 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      content_drafts: {
+        Row: {
+          content: string | null
+          content_type: string
+          created_at: string
+          id: string
+          review_notes: string | null
+          reviewed_by: string | null
+          status: string
+          submitted_by: string
+          team_id: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content?: string | null
+          content_type?: string
+          created_at?: string
+          id?: string
+          review_notes?: string | null
+          reviewed_by?: string | null
+          status?: string
+          submitted_by: string
+          team_id?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string | null
+          content_type?: string
+          created_at?: string
+          id?: string
+          review_notes?: string | null
+          reviewed_by?: string | null
+          status?: string
+          submitted_by?: string
+          team_id?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_drafts_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       ecommerce_products: {
         Row: {
@@ -232,6 +318,27 @@ export type Database = {
           full_name?: string | null
           id?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      saved_hashtags: {
+        Row: {
+          created_at: string
+          hashtag: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          hashtag: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          hashtag?: string
+          id?: string
+          user_id?: string
         }
         Relationships: []
       }
