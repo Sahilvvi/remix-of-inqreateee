@@ -89,10 +89,10 @@ const DashboardLayout = ({ children, activeRoute, onRouteChange }: DashboardLayo
     { id: "social", label: "Social Media", icon: MessageSquare },
     { id: "posting", label: "Auto Posting", icon: Calendar },
     { id: "seo", label: "SEO Optimization", icon: Search },
-    { id: "templates", label: "Brand Templates", icon: Palette },
-    { id: "ecommerce", label: "E-Commerce", icon: ShoppingCart },
+    { id: "ecommerce-tools", label: "E-commerce Tools", icon: ShoppingCart },
+    { id: "brand-kit", label: "Brand Kit & Teams", icon: Palette },
+    { id: "templates", label: "Templates Library", icon: FileText },
     { id: "analytics", label: "Analytics", icon: BarChart3 },
-    { id: "team", label: "Team", icon: Users },
   ];
 
   const handleRouteChange = (route: string) => {
