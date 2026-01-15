@@ -248,39 +248,34 @@ const DashboardLayout = ({ children, activeRoute, onRouteChange }: DashboardLayo
       </aside>
 
       {/* Top Header Bar - Desktop */}
-      <header className="hidden lg:flex fixed top-0 left-[220px] right-0 h-14 bg-card border-b border-border z-30 items-center px-6">
+      <header className="hidden lg:flex fixed top-0 left-[220px] right-0 h-14 bg-background/80 backdrop-blur-md border-b border-border/50 z-30 items-center px-6">
         {/* Left spacer for balance */}
         <div className="flex-1" />
 
-        {/* Centered Title */}
-        <div className="absolute left-1/2 -translate-x-1/2">
-          <span className="text-sm font-medium text-foreground">{getActiveLabel()}</span>
-        </div>
-
         {/* Right side controls */}
-        <div className="flex items-center gap-4 flex-1 justify-end">
+        <div className="flex items-center gap-3 flex-1 justify-end">
           {/* Search */}
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input 
               placeholder="Search content, posts, or users" 
-              className="w-[280px] pl-9 h-9 bg-background border-border text-sm"
+              className="w-[280px] pl-9 h-9 bg-muted/50 border-border/50 text-sm placeholder:text-muted-foreground/70 focus:bg-muted"
             />
           </div>
 
           {/* Create Content Button */}
-          <Button className="h-9 bg-[#0d9488] hover:bg-[#0f766e] text-white text-sm font-medium">
+          <Button className="h-9 bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-medium">
             <Plus className="w-4 h-4 mr-1.5" />
             Create Content
           </Button>
 
           {/* Notification Bell */}
-          <Button variant="ghost" size="icon" className="h-9 w-9 text-muted-foreground hover:text-foreground">
+          <Button variant="ghost" size="icon" className="h-9 w-9 text-muted-foreground hover:text-foreground hover:bg-muted/50">
             <Bell className="w-[18px] h-[18px]" />
           </Button>
 
           {/* User Avatar */}
-          <Avatar className="h-8 w-8 cursor-pointer">
+          <Avatar className="h-8 w-8 cursor-pointer ring-2 ring-border/50">
             <AvatarImage src={user?.user_metadata?.avatar_url} />
             <AvatarFallback className="bg-primary/20 text-primary text-xs font-medium">
               {user?.email?.charAt(0).toUpperCase()}
