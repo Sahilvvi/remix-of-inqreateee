@@ -1,14 +1,10 @@
 import { useState, useEffect, useRef } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { 
-  Loader2, Download, Package, Sparkles, Upload, Eye, EyeOff,
-  FileSpreadsheet, CheckSquare, Square, Table, X, Copy
+  Loader2, Download, Package, Sparkles, Upload, Eye, Copy
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -43,16 +39,16 @@ interface GeneratedProduct {
 }
 
 const platforms = [
-  { id: "amazon", name: "Amazon", checked: false },
-  { id: "meesho", name: "Meesho", checked: false },
-  { id: "flipkart", name: "Flipkart", checked: false },
-  { id: "shopify", name: "Shopify", checked: false },
+  { id: "amazon", name: "Amazon" },
+  { id: "meesho", name: "Meesho" },
+  { id: "flipkart", name: "Flipkart" },
+  { id: "shopify", name: "Shopify" },
 ];
 
 const contentTypes = [
-  { id: "titles", name: "Titles", checked: true },
-  { id: "descriptions", name: "Descriptions", checked: true },
-  { id: "bullet_points", name: "Bullet Points", checked: false },
+  { id: "titles", name: "Titles" },
+  { id: "descriptions", name: "Descriptions" },
+  { id: "bullet_points", name: "Bullet Points" },
 ];
 
 const suggestedKeywords = [
@@ -76,14 +72,6 @@ const EcommerceContentTools = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [products, setProducts] = useState<ProductListing[]>([]);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
-  const [visibleColumns, setVisibleColumns] = useState({
-    productName: true,
-    platform: true,
-    title: true,
-    description: true,
-    bulletPoints: true,
-    keywords: true,
-  });
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
@@ -198,7 +186,6 @@ const EcommerceContentTools = () => {
     try {
       const results: GeneratedProduct[] = [];
       
-      // Generate content for each platform
       for (const platform of selectedPlatforms) {
         const { data, error } = await supabase.functions.invoke('generate-product', {
           body: { 
@@ -275,17 +262,26 @@ const EcommerceContentTools = () => {
   };
 
   const downloadAllListings = () => {
-    if (generatedProducts.length === 0) return;
+    const allProducts = [...generatedProducts.map(p => ({
+      product_name: p.productName,
+      platform: p.platform,
+      title: p.title,
+      description: p.description,
+      bullet_points: p.bulletPoints,
+      keywords: p.keywords,
+    })), ...products];
+
+    if (allProducts.length === 0) return;
 
     const csvContent = [
       ["Product Name", "Platform", "Title", "Description", "Bullet Points", "Keywords"].join(","),
-      ...generatedProducts.map(p => [
-        `"${p.productName}"`,
+      ...allProducts.map(p => [
+        `"${p.product_name}"`,
         `"${p.platform}"`,
         `"${p.title}"`,
-        `"${p.description.replace(/"/g, '""')}"`,
-        `"${p.bulletPoints.join('; ')}"`,
-        `"${p.keywords.join(', ')}"`,
+        `"${p.description?.replace(/"/g, '""') || ''}"`,
+        `"${(p.bullet_points || []).join('; ')}"`,
+        `"${(p.keywords || []).join(', ')}"`,
       ].join(","))
     ].join("\n");
 
@@ -307,239 +303,203 @@ const EcommerceContentTools = () => {
     toast({ title: "Copied to clipboard!" });
   };
 
+  const allProducts = [
+    ...generatedProducts.map((p, idx) => ({ ...p, id: `gen-${idx}`, isGenerated: true })),
+    ...products.map(p => ({ 
+      ...p, 
+      productName: p.product_name,
+      bulletPoints: p.bullet_points || [],
+      keywords: p.keywords || [],
+      isGenerated: false 
+    }))
+  ];
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-1">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-bold gradient-text mb-2">E-commerce Content Tools</h1>
-        <p className="text-sm sm:text-base text-muted-foreground">
+      <div className="mb-6">
+        <h1 className="text-2xl font-semibold text-foreground mb-1">E-commerce Content Tools</h1>
+        <p className="text-muted-foreground text-sm">
           Streamline the creation of product listings for online marketplaces with AI-powered titles, descriptions, and SEO keywords.
         </p>
       </div>
 
-      {/* Input Section */}
+      {/* Input Section - Two Column Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Product Details Input */}
-        <Card className="glass-effect">
-          <CardHeader>
-            <CardTitle className="text-lg">Product Details Input</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <Textarea
-              placeholder='Enter product details (e.g., "Luxury Leather Handbag, black, durable, spacious, for women")...'
-              value={productInput}
-              onChange={(e) => setProductInput(e.target.value)}
-              className="min-h-[120px] resize-none"
-            />
-            <div className="flex gap-2">
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".csv,.xlsx,.txt"
-                onChange={handleFileUpload}
-                className="hidden"
-              />
-              <Button 
-                variant="outline" 
-                className="w-full"
-                onClick={() => fileInputRef.current?.click()}
-              >
-                <Upload className="w-4 h-4 mr-2" />
-                Upload Product List (CSV/Excel)
-              </Button>
-            </div>
-            <p className="text-xs text-muted-foreground">Max 50 products per batch.</p>
-          </CardContent>
-        </Card>
+        <div className="bg-card rounded-lg border border-border p-5">
+          <h2 className="text-base font-semibold text-foreground mb-4">Product Details Input</h2>
+          <Textarea
+            placeholder='Enter product details (e.g., "Luxury Leather Handbag, black, durable, spacious, for women")...'
+            value={productInput}
+            onChange={(e) => setProductInput(e.target.value)}
+            className="min-h-[100px] resize-none bg-background border-border text-foreground placeholder:text-muted-foreground mb-4"
+          />
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".csv,.xlsx,.txt"
+            onChange={handleFileUpload}
+            className="hidden"
+          />
+          <Button 
+            variant="outline" 
+            className="w-full border-border text-foreground hover:bg-muted"
+            onClick={() => fileInputRef.current?.click()}
+          >
+            <Upload className="w-4 h-4 mr-2" />
+            Upload Product List (CSV/Excel)
+          </Button>
+          <p className="text-xs text-muted-foreground mt-3">Max 50 products per batch.</p>
+        </div>
 
-        {/* Platforms & Content Types */}
-        <Card className="glass-effect">
-          <CardHeader>
-            <CardTitle className="text-lg">Target Platforms & Content Types</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {/* Platforms */}
-            <div className="space-y-3">
-              <Label className="text-sm font-semibold">Select Platforms:</Label>
-              <div className="grid grid-cols-2 gap-3">
-                {platforms.map((platform) => (
-                  <div key={platform.id} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={platform.id}
-                      checked={selectedPlatforms.includes(platform.id)}
-                      onCheckedChange={() => togglePlatform(platform.id)}
-                    />
-                    <label
-                      htmlFor={platform.id}
-                      className="text-sm font-medium leading-none cursor-pointer"
-                    >
-                      {platform.name}
-                    </label>
-                  </div>
-                ))}
-              </div>
+        {/* Target Platforms & Content Types */}
+        <div className="bg-card rounded-lg border border-border p-5">
+          <h2 className="text-base font-semibold text-foreground mb-4">Target Platforms & Content Types</h2>
+          
+          {/* Platforms */}
+          <div className="mb-5">
+            <p className="text-sm font-medium text-foreground mb-3">Select Platforms:</p>
+            <div className="grid grid-cols-2 gap-x-8 gap-y-2">
+              {platforms.map((platform) => (
+                <div key={platform.id} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={platform.id}
+                    checked={selectedPlatforms.includes(platform.id)}
+                    onCheckedChange={() => togglePlatform(platform.id)}
+                    className="border-muted-foreground data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                  />
+                  <label
+                    htmlFor={platform.id}
+                    className="text-sm text-foreground cursor-pointer"
+                  >
+                    {platform.name}
+                  </label>
+                </div>
+              ))}
             </div>
+          </div>
 
-            {/* Content Types */}
-            <div className="space-y-3">
-              <Label className="text-sm font-semibold">Select Content Types:</Label>
-              <div className="grid grid-cols-2 gap-3">
-                {contentTypes.map((type) => (
-                  <div key={type.id} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={type.id}
-                      checked={selectedContentTypes.includes(type.id)}
-                      onCheckedChange={() => toggleContentType(type.id)}
-                    />
-                    <label
-                      htmlFor={type.id}
-                      className="text-sm font-medium leading-none cursor-pointer"
-                    >
-                      {type.name}
-                    </label>
-                  </div>
-                ))}
-              </div>
+          {/* Content Types */}
+          <div className="mb-5">
+            <p className="text-sm font-medium text-foreground mb-3">Select Content Types:</p>
+            <div className="grid grid-cols-2 gap-x-8 gap-y-2">
+              {contentTypes.map((type) => (
+                <div key={type.id} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={type.id}
+                    checked={selectedContentTypes.includes(type.id)}
+                    onCheckedChange={() => toggleContentType(type.id)}
+                    className="border-muted-foreground data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                  />
+                  <label
+                    htmlFor={type.id}
+                    className="text-sm text-foreground cursor-pointer"
+                  >
+                    {type.name}
+                  </label>
+                </div>
+              ))}
             </div>
+          </div>
 
-            <Button
-              onClick={handleGenerate}
-              disabled={isLoading}
-              className="w-full bg-primary hover:bg-primary/90"
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Generating...
-                </>
-              ) : (
-                <>
-                  <Sparkles className="w-4 h-4 mr-2" />
-                  Generate Content
-                </>
-              )}
-            </Button>
-          </CardContent>
-        </Card>
+          <Button
+            onClick={handleGenerate}
+            disabled={isLoading}
+            className="w-full bg-[#0d9488] hover:bg-[#0f766e] text-white font-medium"
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Generating...
+              </>
+            ) : (
+              <>
+                <Sparkles className="w-4 h-4 mr-2" />
+                Generate Content
+              </>
+            )}
+          </Button>
+        </div>
       </div>
 
       {/* Generated Product Listings */}
-      <Card className="glass-effect">
-        <CardHeader>
-          <div className="flex items-center justify-between flex-wrap gap-4">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Table className="w-5 h-5" />
-              Generated Product Listings
-            </CardTitle>
-            {generatedProducts.length > 0 && (
-              <div className="flex gap-2">
-                <Button variant="outline" size="sm" onClick={saveAllListings}>
-                  <Package className="w-4 h-4 mr-2" />
-                  Save All
-                </Button>
-                <Button variant="outline" size="sm" onClick={downloadAllListings}>
-                  <Download className="w-4 h-4 mr-2" />
-                  Download All Listings
-                </Button>
-              </div>
-            )}
-          </div>
-        </CardHeader>
-        <CardContent>
-          {generatedProducts.length === 0 && products.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground">
-              <Package className="w-12 h-12 mx-auto mb-4 opacity-50" />
+      <div className="bg-card rounded-lg border border-border">
+        <div className="flex items-center justify-between p-5 border-b border-border">
+          <h2 className="text-base font-semibold text-foreground">Generated Product Listings</h2>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={downloadAllListings}
+            className="border-border text-foreground hover:bg-muted"
+            disabled={allProducts.length === 0}
+          >
+            <Download className="w-4 h-4 mr-2" />
+            Download All Listings
+          </Button>
+        </div>
+        
+        <div className="p-0">
+          {allProducts.length === 0 ? (
+            <div className="text-center py-16 text-muted-foreground">
+              <Package className="w-12 h-12 mx-auto mb-4 opacity-40" />
               <p>No product listings yet. Enter product details and generate content.</p>
             </div>
           ) : (
-            <ScrollArea className="h-[400px]">
+            <ScrollArea className="h-[350px]">
               <UITable>
                 <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-[150px]">Product Name</TableHead>
-                    <TableHead className="w-[100px]">Platform</TableHead>
-                    <TableHead className="w-[200px]">Title</TableHead>
-                    <TableHead className="min-w-[250px]">Description</TableHead>
-                    <TableHead className="min-w-[200px]">Bullet Points</TableHead>
-                    <TableHead className="min-w-[150px]">Keywords</TableHead>
-                    <TableHead className="w-[80px]">Action</TableHead>
+                  <TableRow className="border-border hover:bg-transparent">
+                    <TableHead className="text-muted-foreground font-medium text-xs uppercase tracking-wide w-[120px]">Product Name</TableHead>
+                    <TableHead className="text-muted-foreground font-medium text-xs uppercase tracking-wide w-[90px]">Platform</TableHead>
+                    <TableHead className="text-muted-foreground font-medium text-xs uppercase tracking-wide w-[180px]">Title</TableHead>
+                    <TableHead className="text-muted-foreground font-medium text-xs uppercase tracking-wide min-w-[200px]">Description</TableHead>
+                    <TableHead className="text-muted-foreground font-medium text-xs uppercase tracking-wide min-w-[180px]">Bullet Points</TableHead>
+                    <TableHead className="text-muted-foreground font-medium text-xs uppercase tracking-wide min-w-[140px]">Keywords</TableHead>
+                    <TableHead className="text-muted-foreground font-medium text-xs uppercase tracking-wide w-[70px]">Action</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {/* Generated products */}
-                  {generatedProducts.map((product, index) => (
-                    <TableRow key={`generated-${index}`} className="bg-primary/5">
-                      <TableCell className="font-medium">{product.productName}</TableCell>
-                      <TableCell>
-                        <Badge variant="outline">{product.platform}</Badge>
+                  {allProducts.map((product, index) => (
+                    <TableRow 
+                      key={product.id || index} 
+                      className={`border-border ${product.isGenerated ? 'bg-primary/5' : ''}`}
+                    >
+                      <TableCell className="font-medium text-foreground text-sm py-4">
+                        {product.productName}
                       </TableCell>
-                      <TableCell className="max-w-[200px] truncate">{product.title}</TableCell>
-                      <TableCell>
-                        <p className="text-xs text-muted-foreground line-clamp-3">
+                      <TableCell className="text-foreground text-sm py-4">
+                        {product.platform}
+                      </TableCell>
+                      <TableCell className="text-foreground text-sm py-4">
+                        <span className="line-clamp-2">{product.title}</span>
+                      </TableCell>
+                      <TableCell className="py-4">
+                        <p className="text-sm text-muted-foreground line-clamp-4 leading-relaxed">
                           {product.description}
                         </p>
                       </TableCell>
-                      <TableCell>
-                        <ul className="text-xs space-y-1">
-                          {product.bulletPoints.slice(0, 3).map((point, i) => (
-                            <li key={i} className="truncate">• {point}</li>
+                      <TableCell className="py-4">
+                        <p className="text-sm text-muted-foreground line-clamp-4 leading-relaxed">
+                          {(product.bulletPoints || []).slice(0, 3).map((point, i) => (
+                            <span key={i} className="block truncate">• {point}</span>
                           ))}
-                        </ul>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex flex-wrap gap-1">
-                          {product.keywords.slice(0, 3).map((keyword, i) => (
-                            <Badge key={i} variant="secondary" className="text-xs">
-                              {keyword}
-                            </Badge>
-                          ))}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => copyToClipboard(JSON.stringify(product, null, 2))}
-                        >
-                          <Copy className="w-4 h-4" />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                  
-                  {/* Saved products */}
-                  {products.map((product) => (
-                    <TableRow key={product.id}>
-                      <TableCell className="font-medium">{product.product_name}</TableCell>
-                      <TableCell>
-                        <Badge variant="outline" className="capitalize">{product.platform}</Badge>
-                      </TableCell>
-                      <TableCell className="max-w-[200px] truncate">{product.title}</TableCell>
-                      <TableCell>
-                        <p className="text-xs text-muted-foreground line-clamp-3">
-                          {product.description}
                         </p>
                       </TableCell>
-                      <TableCell>
-                        <ul className="text-xs space-y-1">
-                          {(product.bullet_points || []).slice(0, 3).map((point, i) => (
-                            <li key={i} className="truncate">• {point}</li>
-                          ))}
-                        </ul>
-                      </TableCell>
-                      <TableCell>
+                      <TableCell className="py-4">
                         <div className="flex flex-wrap gap-1">
-                          {(product.keywords || []).slice(0, 3).map((keyword, i) => (
-                            <Badge key={i} variant="secondary" className="text-xs">
-                              {keyword}
-                            </Badge>
+                          {(product.keywords || []).slice(0, 4).map((keyword, i) => (
+                            <span key={i} className="text-xs text-muted-foreground">
+                              {keyword}{i < Math.min((product.keywords || []).length, 4) - 1 ? ',' : ''}
+                            </span>
                           ))}
                         </div>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="py-4">
                         <Button
                           variant="ghost"
                           size="icon"
+                          className="h-8 w-8 text-muted-foreground hover:text-foreground"
                           onClick={() => copyToClipboard(JSON.stringify(product, null, 2))}
                         >
                           <Eye className="w-4 h-4" />
@@ -551,32 +511,28 @@ const EcommerceContentTools = () => {
               </UITable>
             </ScrollArea>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* Suggested SEO Keywords */}
-      <Card className="glass-effect">
-        <CardHeader>
-          <CardTitle className="text-lg">Suggested SEO Keywords</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-wrap gap-2 mb-4">
-            {suggestedKeywords.map((keyword, index) => (
-              <Badge
-                key={index}
-                variant="outline"
-                className="cursor-pointer hover:bg-primary/10 transition-colors px-3 py-1"
-                onClick={() => copyToClipboard(keyword)}
-              >
-                {keyword}
-              </Badge>
-            ))}
-          </div>
-          <p className="text-xs text-muted-foreground">
-            Keywords automatically generated based on product details and platform best practices.
-          </p>
-        </CardContent>
-      </Card>
+      <div className="bg-card rounded-lg border border-border p-5">
+        <h2 className="text-base font-semibold text-foreground mb-4">Suggested SEO Keywords</h2>
+        <div className="flex flex-wrap gap-2 mb-3">
+          {suggestedKeywords.map((keyword, index) => (
+            <Badge
+              key={index}
+              variant="outline"
+              className="cursor-pointer hover:bg-muted transition-colors px-3 py-1.5 text-sm font-normal border-border text-foreground bg-background"
+              onClick={() => copyToClipboard(keyword)}
+            >
+              {keyword}
+            </Badge>
+          ))}
+        </div>
+        <p className="text-xs text-muted-foreground">
+          Keywords automatically generated based on product details and platform best practices.
+        </p>
+      </div>
     </div>
   );
 };
