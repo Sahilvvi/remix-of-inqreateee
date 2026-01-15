@@ -29,15 +29,15 @@ const CTASection = () => {
             Join thousands of content creators who are saving time and scaling their business with AI automation
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-            <Link to="/auth">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center w-full">
+            <Link to="/auth" className="w-full sm:w-auto">
               <Button 
                 size="lg" 
-                className="group h-16 px-10 text-xl font-bold bg-gradient-to-r from-primary via-secondary to-accent hover:shadow-neon animate-shine relative overflow-hidden"
+                className="group h-14 sm:h-16 px-8 sm:px-10 text-lg sm:text-xl font-bold bg-gradient-to-r from-primary to-accent hover:opacity-90 hover:shadow-lg transition-all duration-300 w-full sm:w-auto"
               >
-                <span className="relative z-10 flex items-center gap-3">
+                <span className="relative z-10 flex items-center justify-center gap-3">
                   Get Started Free
-                  <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6 group-hover:translate-x-1 transition-transform" />
                 </span>
               </Button>
             </Link>
@@ -45,7 +45,7 @@ const CTASection = () => {
             <Button 
               size="lg" 
               variant="outline"
-              className="h-16 px-10 text-xl font-bold glass-card hover-glow border-2 border-primary/50"
+              className="h-14 sm:h-16 px-8 sm:px-10 text-lg sm:text-xl font-bold glass-card hover-glow border-2 border-primary/50 transition-all duration-300 w-full sm:w-auto"
             >
               See Demo
             </Button>
