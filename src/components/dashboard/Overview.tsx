@@ -121,73 +121,69 @@ const Overview = () => {
   const statCards = [
     {
       title: "Total Blogs Generated",
-      value: loading ? "..." : stats.totalBlogs.toString(),
+      value: loading ? "—" : stats.totalBlogs.toString(),
       change: `+${stats.blogsThisWeek} this week`,
       icon: FileText,
-      color: "from-blue-500 to-cyan-500",
+      iconBg: "bg-primary/10",
+      iconColor: "text-primary",
     },
     {
       title: "Total Words Written",
-      value: loading ? "..." : stats.totalWords.toLocaleString(),
+      value: loading ? "—" : stats.totalWords.toLocaleString(),
       change: `${Math.round(stats.totalWords / (stats.totalBlogs || 1))} avg/blog`,
       icon: MessageSquare,
-      color: "from-purple-500 to-pink-500",
+      iconBg: "bg-blue-500/10",
+      iconColor: "text-blue-400",
     },
     {
       title: "This Week's Activity",
-      value: loading ? "..." : `${stats.blogsThisWeek}`,
+      value: loading ? "—" : `${stats.blogsThisWeek}`,
       change: `${stats.totalBlogs > 0 ? Math.round((stats.blogsThisWeek / stats.totalBlogs) * 100) : 0}% of total`,
       icon: TrendingUp,
-      color: "from-green-500 to-emerald-500",
+      iconBg: "bg-emerald-500/10",
+      iconColor: "text-emerald-400",
     },
     {
       title: "Recent Activity",
-      value: loading ? "..." : stats.recentBlogs.length > 0 ? "Active" : "Start Now",
+      value: loading ? "—" : stats.recentBlogs.length > 0 ? "Active" : "Start Now",
       change: stats.recentBlogs.length > 0 ? "Last 7 days" : "Generate your first blog",
       icon: Users,
-      color: "from-orange-500 to-red-500",
+      iconBg: "bg-amber-500/10",
+      iconColor: "text-amber-400",
     },
   ];
 
   return (
-    <div className="space-y-6 sm:space-y-8 relative">
-      {/* Background glow effects */}
-      <div className="absolute -top-20 right-0 w-48 sm:w-96 h-48 sm:h-96 bg-primary rounded-full blur-3xl opacity-10 animate-pulse-slow pointer-events-none"></div>
-      <div className="absolute top-1/2 left-0 w-48 sm:w-96 h-48 sm:h-96 bg-secondary rounded-full blur-3xl opacity-10 animate-pulse-slow pointer-events-none"></div>
-
+    <div className="space-y-6 sm:space-y-8">
       <div className="animate-slide-up">
-        <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold mb-2 gradient-text neon-text">Welcome Back!</h1>
-        <p className="text-sm sm:text-lg text-muted-foreground">
-          Here's an overview of your AI automation platform
+        <h1 className="text-2xl sm:text-3xl font-semibold text-foreground mb-1">Welcome Back</h1>
+        <p className="text-sm sm:text-base text-muted-foreground">
+          Here's an overview of your content platform
         </p>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {statCards.map((stat, index) => {
           const Icon = stat.icon;
           return (
             <Card 
               key={index} 
-              className="p-3 sm:p-6 glass-card hover-lift cursor-pointer animate-scale-in border-2 border-transparent hover-glow relative overflow-hidden group"
-              style={{ animationDelay: `${index * 0.1}s` }}
+              className="p-4 sm:p-5 bg-card border-border hover:border-primary/20 transition-colors cursor-pointer animate-scale-in"
+              style={{ animationDelay: `${index * 0.05}s` }}
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-secondary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              
-              <div className="relative z-10">
-                <div className={`inline-flex items-center justify-center w-10 h-10 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br ${stat.color} mb-2 sm:mb-4 group-hover:scale-110 transition-transform duration-300 animate-glow`}>
-                  <Icon className="w-5 h-5 sm:w-7 sm:h-7 text-white" />
-                </div>
-                <p className="text-xs sm:text-sm text-muted-foreground mb-1 sm:mb-2 font-medium line-clamp-1">{stat.title}</p>
-                <p className="text-xl sm:text-4xl font-bold mb-1 sm:mb-2 gradient-text">{stat.value}</p>
-                <p className="text-xs sm:text-sm font-semibold text-green-600 bg-green-500/10 px-2 sm:px-3 py-0.5 sm:py-1 rounded-full inline-block line-clamp-1">{stat.change}</p>
+              <div className={`inline-flex items-center justify-center w-10 h-10 rounded-lg ${stat.iconBg} mb-3`}>
+                <Icon className={`w-5 h-5 ${stat.iconColor}`} />
               </div>
+              <p className="text-xs sm:text-sm text-muted-foreground mb-1">{stat.title}</p>
+              <p className="text-xl sm:text-2xl font-semibold text-foreground mb-1">{stat.value}</p>
+              <p className="text-xs text-emerald-400">{stat.change}</p>
             </Card>
           );
         })}
       </div>
 
       {/* Usage Overview and Quick Previews */}
-      <div className="grid lg:grid-cols-2 gap-6">
+      <div className="grid lg:grid-cols-2 gap-4 sm:gap-6">
         <UsageOverview
           blogsGenerated={stats.totalBlogs}
           socialPosts={stats.socialPosts}
@@ -201,47 +197,47 @@ const Overview = () => {
         />
       </div>
 
-      <div className="grid md:grid-cols-2 gap-4 sm:gap-6">
-        <Card className="p-4 sm:p-6 glass-card hover-lift animate-scale-in" style={{ animationDelay: '0.4s' }}>
-          <h3 className="text-lg sm:text-2xl font-bold mb-4 sm:mb-6 gradient-text flex items-center gap-2">
-            <Clock className="w-5 h-5 sm:w-6 sm:h-6" />
+      <div className="grid md:grid-cols-2 gap-4">
+        <Card className="p-4 sm:p-5 bg-card border-border animate-scale-in" style={{ animationDelay: '0.2s' }}>
+          <h3 className="text-base sm:text-lg font-medium text-foreground mb-4 flex items-center gap-2">
+            <Clock className="w-4 h-4 text-muted-foreground" />
             Recent Activity
           </h3>
-          <div className="space-y-2 sm:space-y-3">
+          <div className="space-y-2">
             {loading ? (
-              <div className="text-center py-6 sm:py-8 text-muted-foreground text-sm">Loading...</div>
+              <div className="text-center py-6 text-muted-foreground text-sm">Loading...</div>
             ) : stats.recentBlogs.length > 0 ? (
-              stats.recentBlogs.slice(0, 3).map((blog, index) => (
+              stats.recentBlogs.slice(0, 3).map((blog) => (
                 <div 
                   key={blog.id} 
-                  className="flex justify-between items-center p-3 sm:p-4 rounded-xl glass-effect hover:bg-accent/50 transition-all duration-300 hover-lift cursor-pointer group"
+                  className="flex justify-between items-center p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors cursor-pointer group"
                   onClick={() => navigate('/dashboard')}
                 >
                   <div className="flex-1 min-w-0 mr-2">
-                    <p className="font-semibold group-hover:gradient-text transition-all truncate text-sm sm:text-base">
+                    <p className="font-medium text-foreground truncate text-sm">
                       {blog.title || "Untitled Blog"}
                     </p>
-                    <p className="text-xs text-muted-foreground mt-0.5 sm:mt-1">Blog post generated</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">Blog post generated</p>
                   </div>
-                  <div className="flex items-center gap-1 sm:gap-2 shrink-0">
-                    <p className="text-xs sm:text-sm text-muted-foreground hidden sm:block">
+                  <div className="flex items-center gap-2 shrink-0">
+                    <p className="text-xs text-muted-foreground hidden sm:block">
                       {new Date(blog.created_at).toLocaleDateString()}
                     </p>
-                    <ArrowUpRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <ArrowUpRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
                   </div>
                 </div>
               ))
             ) : (
-              <div className="text-center py-6 sm:py-8 text-muted-foreground text-sm">
+              <div className="text-center py-6 text-muted-foreground text-sm">
                 No activity yet. Start by generating your first blog!
               </div>
             )}
           </div>
         </Card>
 
-        <Card className="p-4 sm:p-6 glass-card hover-lift animate-scale-in" style={{ animationDelay: '0.5s' }}>
-          <h3 className="text-lg sm:text-2xl font-bold mb-4 sm:mb-6 gradient-text">Quick Actions</h3>
-          <div className="grid grid-cols-2 gap-2 sm:gap-4">
+        <Card className="p-4 sm:p-5 bg-card border-border animate-scale-in" style={{ animationDelay: '0.25s' }}>
+          <h3 className="text-base sm:text-lg font-medium text-foreground mb-4">Quick Actions</h3>
+          <div className="grid grid-cols-2 gap-2 sm:gap-3">
             {[
               { label: "Generate Blog", route: "/dashboard", action: "blog" },
               { label: "Create Post", route: "/dashboard", action: "social" },
@@ -257,10 +253,9 @@ const Overview = () => {
                     window.dispatchEvent(event);
                   }, 100);
                 }}
-                className="p-3 sm:p-6 glass-card hover-glow rounded-xl transition-all duration-300 hover-lift text-left group border-2 border-transparent relative overflow-hidden"
+                className="p-3 sm:p-4 bg-muted/30 hover:bg-muted/50 border border-transparent hover:border-primary/20 rounded-lg transition-all text-left"
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-secondary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                <p className="font-semibold relative z-10 gradient-text text-sm sm:text-lg">{action.label}</p>
+                <p className="font-medium text-foreground text-sm">{action.label}</p>
               </button>
             ))}
           </div>

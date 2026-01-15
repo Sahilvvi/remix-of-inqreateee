@@ -43,34 +43,34 @@ export const QuickPreviews = ({ onNavigate }: QuickPreviewsProps) => {
   ];
 
   return (
-    <Card className="glass-effect">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Eye className="h-5 w-5 text-primary" />
+    <Card className="bg-card border-border">
+      <CardHeader className="pb-4">
+        <CardTitle className="text-base font-medium flex items-center gap-2">
+          <Eye className="h-4 w-4 text-primary" />
           Quick Previews
         </CardTitle>
-        <CardDescription>Recent content across all modules</CardDescription>
+        <CardDescription className="text-sm">Recent content across all modules</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-3">
+      <CardContent className="space-y-2">
         {previews.map((item, index) => {
           const Icon = item.icon;
           return (
             <div
               key={index}
-              className="p-4 rounded-lg border bg-card/50 hover:bg-card transition-colors cursor-pointer"
+              className="p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors cursor-pointer"
               onClick={() => onNavigate(item.route)}
             >
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex items-start gap-3 flex-1">
-                  <Icon className={`h-5 w-5 ${item.color} mt-0.5`} />
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-start gap-2.5 flex-1">
+                  <Icon className={`h-4 w-4 ${item.color} mt-0.5`} />
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-sm mb-1">{item.title}</p>
-                    <p className="text-sm text-muted-foreground truncate">{item.preview}</p>
-                    <p className="text-xs text-muted-foreground mt-1">{item.date}</p>
+                    <p className="font-medium text-sm text-foreground mb-0.5">{item.title}</p>
+                    <p className="text-xs text-muted-foreground truncate">{item.preview}</p>
+                    <p className="text-xs text-muted-foreground/70 mt-1">{item.date}</p>
                   </div>
                 </div>
-                <Button size="sm" variant="ghost" className="shrink-0">
-                  <Eye className="h-4 w-4" />
+                <Button size="sm" variant="ghost" className="shrink-0 h-7 w-7 p-0 text-muted-foreground hover:text-foreground">
+                  <Eye className="h-3.5 w-3.5" />
                 </Button>
               </div>
             </div>

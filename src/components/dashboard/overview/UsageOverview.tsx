@@ -53,20 +53,19 @@ export const UsageOverview = ({ blogsGenerated, socialPosts, seoAnalyses, produc
   ];
 
   return (
-    <Card className="glass-effect">
-      <CardHeader>
+    <Card className="bg-card border-border">
+      <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="flex items-center gap-2">
-              <Zap className="h-5 w-5 text-primary" />
+            <CardTitle className="text-base font-medium flex items-center gap-2">
+              <Zap className="h-4 w-4 text-primary" />
               Usage Overview
             </CardTitle>
-            <CardDescription>Your monthly content generation usage</CardDescription>
+            <CardDescription className="text-sm">Your monthly content generation usage</CardDescription>
           </div>
-          <TrendingUp className="h-8 w-8 text-primary/50" />
         </div>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-5">
         {usageData.map((item, index) => {
           const Icon = item.icon;
           const percentage = (item.current / item.limit) * 100;
@@ -74,17 +73,17 @@ export const UsageOverview = ({ blogsGenerated, socialPosts, seoAnalyses, produc
           return (
             <div key={index} className="space-y-2">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className={`p-2 rounded-lg ${item.bgColor}`}>
-                    <Icon className={`h-4 w-4 ${item.color}`} />
+                <div className="flex items-center gap-2">
+                  <div className={`p-1.5 rounded-md ${item.bgColor}`}>
+                    <Icon className={`h-3.5 w-3.5 ${item.color}`} />
                   </div>
-                  <span className="font-medium">{item.label}</span>
+                  <span className="text-sm font-medium text-foreground">{item.label}</span>
                 </div>
-                <span className="text-sm text-muted-foreground">
+                <span className="text-xs text-muted-foreground">
                   {item.current} / {item.limit}
                 </span>
               </div>
-              <Progress value={percentage} className="h-2" />
+              <Progress value={percentage} className="h-1.5" />
               <div className="flex justify-between text-xs text-muted-foreground">
                 <span>{percentage.toFixed(0)}% used</span>
                 <span>{item.limit - item.current} remaining</span>
