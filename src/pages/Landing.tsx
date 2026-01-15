@@ -7,7 +7,6 @@ import AIShowcase from "@/components/landing/AIShowcase";
 import HowItWorks from "@/components/landing/HowItWorks";
 import BrandKitSection from "@/components/landing/BrandKitSection";
 import UseCases from "@/components/landing/UseCases";
-import Comparison from "@/components/landing/Comparison";
 import Testimonials from "@/components/landing/Testimonials";
 import Pricing from "@/components/landing/Pricing";
 import FAQ from "@/components/landing/FAQ";
@@ -26,7 +25,6 @@ const Landing = () => {
       <HowItWorks />
       <BrandKitSection />
       <UseCases />
-      <Comparison />
       <Testimonials />
       <Pricing />
       <FAQ />
