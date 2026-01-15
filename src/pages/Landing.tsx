@@ -3,7 +3,6 @@ import Hero from "@/components/landing/Hero";
 import Stats from "@/components/landing/Stats";
 import FeaturesGrid from "@/components/landing/FeaturesGrid";
 import LanguageSupport from "@/components/landing/LanguageSupport";
-import AIShowcase from "@/components/landing/AIShowcase";
 import HowItWorks from "@/components/landing/HowItWorks";
 import BrandKitSection from "@/components/landing/BrandKitSection";
 import UseCases from "@/components/landing/UseCases";
@@ -21,7 +20,6 @@ const Landing = () => {
       <Stats />
       <FeaturesGrid />
       <LanguageSupport />
-      <AIShowcase />
       <HowItWorks />
       <BrandKitSection />
       <UseCases />
