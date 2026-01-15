@@ -1,5 +1,7 @@
+import { useState, useEffect } from "react";
 import { TrendingUp, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
 import usersNetwork from "@/assets/users-network-3d.png";
 import contentFlow from "@/assets/content-flow-3d.png";
 import globalReach from "@/assets/global-reach-3d.png";
@@ -8,9 +10,36 @@ import floatGraphic1 from "@/assets/float-graphic-1.png";
 import floatGraphic2 from "@/assets/float-graphic-2.png";
 
 const Stats = () => {
+  const [platformStats, setPlatformStats] = useState({
+    users: 0,
+    content: 0,
+    countries: 1,
+    uptime: 99.9,
+  });
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const { data, error } = await supabase.functions.invoke('get-platform-stats');
+        if (data && !error) {
+          setPlatformStats(data);
+        }
+      } catch (error) {
+        console.error('Error fetching stats:', error);
+      }
+    };
+    fetchStats();
+  }, []);
+
+  const formatNumber = (num: number): string => {
+    if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M+`;
+    if (num >= 1000) return `${(num / 1000).toFixed(1)}K+`;
+    return num > 0 ? `${num}+` : "0";
+  };
+
   const stats = [
     {
-      value: "50K+",
+      value: formatNumber(platformStats.users),
       label: "Active Users",
       description: "Growing community",
       gradient: "from-[#3B82F6] to-[#06B6D4]",
@@ -18,7 +47,7 @@ const Stats = () => {
       badge: "🚀 Trending",
     },
     {
-      value: "2M+",
+      value: formatNumber(platformStats.content),
       label: "Content Generated",
       description: "AI-powered posts",
       gradient: "from-[#9333EA] to-[#EC4899]",
@@ -26,7 +55,7 @@ const Stats = () => {
       badge: "✨ Popular",
     },
     {
-      value: "120+",
+      value: `${platformStats.countries}+`,
       label: "Countries",
       description: "Worldwide reach",
       gradient: "from-[#10B981] to-[#059669]",
@@ -34,7 +63,7 @@ const Stats = () => {
       badge: "🌍 Global",
     },
     {
-      value: "99.9%",
+      value: `${platformStats.uptime}%`,
       label: "Uptime",
       description: "Always reliable",
       gradient: "from-[#F59E0B] to-[#EF4444]",
