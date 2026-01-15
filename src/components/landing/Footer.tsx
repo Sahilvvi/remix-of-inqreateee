@@ -5,19 +5,19 @@ import inqreateLogo from "@/assets/inqreate-logo.png";
 const Footer = () => {
   const footerLinks = {
     company: [
-      { label: "About", href: "#about" },
-      { label: "Careers", href: "#careers" },
-      { label: "Blog", href: "#blog" },
+      { label: "About", href: "/about" },
+      { label: "Careers", href: "/careers" },
+      { label: "Blog", href: "/blog" },
     ],
     product: [
-      { label: "Features", href: "#features" },
-      { label: "Pricing", href: "#pricing" },
-      { label: "Demo", href: "#demo" },
+      { label: "Features", href: "/#features" },
+      { label: "Pricing", href: "/#pricing" },
+      { label: "Contact", href: "/contact" },
     ],
     support: [
-      { label: "Help Center", href: "#help" },
-      { label: "FAQs", href: "#faq" },
-      { label: "Contact", href: "#contact" },
+      { label: "Help Center", href: "/contact" },
+      { label: "FAQs", href: "/#faq" },
+      { label: "Contact", href: "/contact" },
     ],
   };
 
@@ -74,9 +74,9 @@ const Footer = () => {
             <ul className="space-y-3">
               {footerLinks.company.map((link) => (
                 <li key={link.label}>
-                  <a href={link.href} className="text-[#9CA3AF] hover:text-white transition-colors">
+                  <Link to={link.href} className="text-[#9CA3AF] hover:text-white transition-colors">
                     {link.label}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -87,9 +87,9 @@ const Footer = () => {
             <ul className="space-y-3">
               {footerLinks.product.map((link) => (
                 <li key={link.label}>
-                  <a href={link.href} className="text-[#9CA3AF] hover:text-white transition-colors">
+                  <Link to={link.href} className="text-[#9CA3AF] hover:text-white transition-colors">
                     {link.label}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -100,9 +100,9 @@ const Footer = () => {
             <ul className="space-y-3">
               {footerLinks.support.map((link) => (
                 <li key={link.label}>
-                  <a href={link.href} className="text-[#9CA3AF] hover:text-white transition-colors">
+                  <Link to={link.href} className="text-[#9CA3AF] hover:text-white transition-colors">
                     {link.label}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -115,12 +115,12 @@ const Footer = () => {
             © 2025 Inqreate. All Rights Reserved.
           </p>
           <div className="flex gap-6 text-sm">
-            <a href="#privacy" className="text-[#9CA3AF] hover:text-white transition-colors">
+            <Link to="/privacy" className="text-[#9CA3AF] hover:text-white transition-colors">
               Privacy Policy
-            </a>
-            <a href="#terms" className="text-[#9CA3AF] hover:text-white transition-colors">
+            </Link>
+            <Link to="/terms" className="text-[#9CA3AF] hover:text-white transition-colors">
               Terms of Service
-            </a>
+            </Link>
           </div>
         </div>
       </div>
