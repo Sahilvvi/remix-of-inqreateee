@@ -11,6 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, Upload, Instagram, Facebook, Twitter, Linkedin, Youtube, Calendar, BarChart3, LinkIcon, Eye } from "lucide-react";
+import ScheduleCalendar from "./ScheduleCalendar";
 
 interface PostingStats {
   thisMonth: number;
@@ -510,9 +511,7 @@ const AutoPosting = () => {
               <CardDescription>View all scheduled posts in calendar format</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-center py-12 text-muted-foreground">
-                Calendar view coming soon...
-              </p>
+              <ScheduleCalendar />
             </CardContent>
           </Card>
         </TabsContent>

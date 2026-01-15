@@ -11,6 +11,8 @@ import Analytics from "@/components/dashboard/Analytics";
 import TeamCollaboration from "@/components/dashboard/TeamCollaboration";
 import BrandKitTeams from "@/components/dashboard/BrandKitTeams";
 import EcommerceContentTools from "@/components/dashboard/EcommerceContentTools";
+import AIImageGenerator from "@/components/dashboard/AIImageGenerator";
+import TemplatesLibrary from "@/components/dashboard/TemplatesLibrary";
 import Settings from "@/pages/Settings";
 import { Card } from "@/components/ui/card";
 
@@ -35,13 +37,13 @@ const Dashboard = () => {
       case "blog":
         return <BlogGenerator />;
       case "social":
-        return <SocialMediaGenerator />;
+        return <AIImageGenerator />;
       case "posting":
         return <AutoPosting />;
       case "seo":
         return <SeoOptimization />;
       case "templates":
-        return <BrandTemplates />;
+        return <TemplatesLibrary />;
       case "ecommerce":
         return <EcommerceGenerator />;
       case "ecommerce-tools":
