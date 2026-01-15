@@ -224,31 +224,6 @@ const FeaturesGrid = () => {
           ))}
         </div>
 
-        {/* Bottom CTA Section */}
-        <div className="mt-20 text-center animate-fade-in">
-          <div className="inline-flex flex-col sm:flex-row items-center gap-6 p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-[#111111] to-[#0D0D0D] border border-white/10 backdrop-blur-sm">
-            <div className="flex items-center gap-4">
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#3B82F6] to-[#9333EA] flex items-center justify-center shadow-lg">
-                <span className="text-2xl">🏆</span>
-              </div>
-              <div className="text-left">
-                <p className="text-lg font-bold text-white">Why We're Better</p>
-                <p className="text-sm text-[#9CA3AF] max-w-md">
-                  Competitors like Jasper & Copy.ai don't offer direct posting, scheduling, or voice input. We do.
-                </p>
-              </div>
-            </div>
-            <Link to="/auth">
-              <Button 
-                size="lg"
-                className="h-12 px-8 text-base font-semibold bg-gradient-to-r from-[#3B82F6] via-[#9333EA] to-[#EC4899] hover:shadow-[0_0_30px_rgba(147,51,234,0.4)] transition-all duration-300 hover:scale-105 rounded-xl"
-              >
-                Get Started Free
-                <ArrowRight className="ml-2 w-5 h-5" />
-              </Button>
-            </Link>
-          </div>
-        </div>
       </div>
     </section>
   );
