@@ -119,13 +119,12 @@ const DashboardLayout = ({ children, activeRoute, onRouteChange }: DashboardLayo
   const SidebarContent = ({ isMobile = false }: { isMobile?: boolean }) => (
     <>
       {/* Logo */}
-      <div className={cn("flex items-center", isMobile ? "justify-between mb-6" : "gap-2 mb-8")}>
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-primary/20 rounded-lg flex items-center justify-center">
-            <Palette className="w-5 h-5 text-primary" />
-          </div>
-          <span className="text-lg font-semibold text-foreground">Logo</span>
-        </div>
+      <div className={cn("flex items-center", isMobile ? "justify-between mb-6" : "mb-8")}>
+        <img 
+          src={inqreateLogo} 
+          alt="Inqreate Logo" 
+          className="h-8 w-auto object-contain"
+        />
         {isMobile && (
           <Button 
             variant="ghost" 
