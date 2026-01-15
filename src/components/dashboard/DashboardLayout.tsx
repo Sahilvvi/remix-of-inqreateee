@@ -249,12 +249,17 @@ const DashboardLayout = ({ children, activeRoute, onRouteChange }: DashboardLayo
       </aside>
 
       {/* Top Header Bar - Desktop */}
-      <header className="hidden lg:flex fixed top-0 left-[220px] right-0 h-14 bg-card border-b border-border z-30 items-center justify-between px-6">
-        <div className="flex items-center gap-6">
+      <header className="hidden lg:flex fixed top-0 left-[220px] right-0 h-14 bg-card border-b border-border z-30 items-center px-6">
+        {/* Left spacer for balance */}
+        <div className="flex-1" />
+
+        {/* Centered Title */}
+        <div className="absolute left-1/2 -translate-x-1/2">
           <span className="text-sm font-medium text-foreground">{getActiveLabel()}</span>
         </div>
 
-        <div className="flex items-center gap-4">
+        {/* Right side controls */}
+        <div className="flex items-center gap-4 flex-1 justify-end">
           {/* Search */}
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
