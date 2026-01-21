@@ -183,6 +183,13 @@ const DashboardLayout = ({ children, activeRoute, onRouteChange }: DashboardLayo
           <Settings className="w-[18px] h-[18px] shrink-0" />
           <span>Settings</span>
         </button>
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-all duration-150 text-sm"
+        >
+          <LogOut className="w-[18px] h-[18px] shrink-0" />
+          <span>Logout</span>
+        </button>
       </div>
 
       {/* Footer */}
