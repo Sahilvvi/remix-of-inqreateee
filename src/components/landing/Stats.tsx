@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { TrendingUp, Sparkles } from "lucide-react";
+import { TrendingUp, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import usersNetwork from "@/assets/users-network-3d.png";
@@ -40,7 +40,9 @@ const Stats = () => {
       value: formatNumber(platformStats.users),
       label: "Active Users",
       description: "Growing community",
-      gradient: "from-[#3B82F6] to-[#06B6D4]",
+      backTitle: "Our Community",
+      backDescription: "Join thousands of creators, marketers, and businesses who trust our platform daily.",
+      color: "#3B82F6",
       image: usersNetwork,
       badge: "🚀 Trending",
     },
@@ -48,7 +50,9 @@ const Stats = () => {
       value: formatNumber(platformStats.content),
       label: "Content Generated",
       description: "AI-powered posts",
-      gradient: "from-[#9333EA] to-[#EC4899]",
+      backTitle: "Content Creation",
+      backDescription: "From blog posts to social media content, we help you create engaging content at scale.",
+      color: "#9333EA",
       image: contentFlow,
       badge: "✨ Popular",
     },
@@ -56,7 +60,9 @@ const Stats = () => {
       value: `${platformStats.countries}+`,
       label: "Countries",
       description: "Worldwide reach",
-      gradient: "from-[#10B981] to-[#059669]",
+      backTitle: "Global Presence",
+      backDescription: "Our platform supports multiple languages and serves users across the globe.",
+      color: "#10B981",
       image: globalReach,
       badge: "🌍 Global",
     },
@@ -64,107 +70,132 @@ const Stats = () => {
       value: `${platformStats.uptime}%`,
       label: "Uptime",
       description: "Always reliable",
-      gradient: "from-[#F59E0B] to-[#EF4444]",
+      backTitle: "Reliability First",
+      backDescription: "Enterprise-grade infrastructure ensuring your content is always accessible.",
+      color: "#F59E0B",
       image: uptimeBolt,
       badge: "⚡ Fast",
     },
   ];
 
   return (
-    <section className="relative py-32 overflow-hidden bg-[#0D0D0D]">
-      {/* Animated background */}
-      <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-gradient-to-b from-[#3B82F6]/5 via-[#9333EA]/5 to-[#0D0D0D]"></div>
-        <div className="absolute top-0 left-0 w-full h-full opacity-20">
-          <div className="absolute top-20 left-10 w-96 h-96 bg-[#3B82F6]/20 rounded-full blur-[120px] animate-pulse-slow"></div>
-          <div className="absolute bottom-20 right-10 w-96 h-96 bg-[#EC4899]/20 rounded-full blur-[120px] animate-pulse-slow"></div>
-        </div>
-      </div>
-
+    <section className="relative py-24 overflow-hidden bg-[#0D0D0D]">
+      {/* Subtle background */}
+      <div className="absolute inset-0 bg-gradient-to-b from-[#111111] to-[#0D0D0D]"></div>
 
       <div className="container mx-auto px-6 relative z-10">
         {/* Section Header */}
-        <div className="text-center mb-20 animate-scale-in">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-card border border-[#3B82F6]/30 mb-6">
+        <div className="text-center mb-16">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 mb-6">
             <TrendingUp className="w-4 h-4 text-[#3B82F6]" />
-            <span className="text-sm font-semibold bg-gradient-to-r from-[#3B82F6] to-[#EC4899] bg-clip-text text-transparent">
+            <span className="text-sm font-medium text-white/80">
               Platform Statistics
             </span>
           </div>
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
             Trusted by Thousands
           </h2>
-          <p className="text-xl text-[#9CA3AF] max-w-2xl mx-auto">
+          <p className="text-lg text-[#9CA3AF] max-w-2xl mx-auto">
             Join the fastest growing AI content platform
           </p>
         </div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
+        {/* Stats Grid with Flip Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
           {stats.map((stat, index) => (
             <div
               key={index}
-              className="group relative animate-scale-in"
-              style={{ animationDelay: `${index * 0.1}s` }}
+              className="group perspective-1000"
+              style={{ perspective: "1000px" }}
             >
-              {/* Card with glass effect */}
-              <div className="relative glass-card border border-white/10 rounded-3xl p-8 hover-lift overflow-hidden transition-all duration-500 group-hover:border-white/20">
-                {/* Background gradient glow */}
-                <div className={`absolute inset-0 bg-gradient-to-br ${stat.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500 rounded-3xl`}></div>
-                
-                {/* Badge */}
-                <div className="absolute top-4 right-4 px-3 py-1 rounded-full glass-card text-xs font-semibold text-white border border-white/20">
-                  {stat.badge}
-                </div>
-
-                {/* Icon/Image */}
-                <div className="relative mb-6 h-24 flex items-center justify-center">
-                  <div className={`absolute inset-0 bg-gradient-to-br ${stat.gradient} rounded-2xl blur-xl opacity-20 group-hover:opacity-40 transition-opacity animate-pulse-slow`}></div>
-                  <img 
-                    src={stat.image} 
-                    alt="" 
-                    className="relative w-20 h-20 object-contain group-hover:scale-110 transition-transform duration-500"
-                  />
-                </div>
-                
-                {/* Stats */}
-                <div className="space-y-3 relative">
-                  <div className={`text-5xl font-bold bg-gradient-to-r ${stat.gradient} bg-clip-text text-transparent group-hover:scale-110 transition-transform duration-300 inline-block`}>
-                    {stat.value}
-                  </div>
-                  <div className="text-xl font-semibold text-white">
-                    {stat.label}
-                  </div>
-                  <div className="text-sm text-[#9CA3AF]">
-                    {stat.description}
+              <div 
+                className="relative w-full h-[320px] transition-transform duration-700 ease-out"
+                style={{ 
+                  transformStyle: "preserve-3d",
+                }}
+              >
+                {/* Front of card */}
+                <div 
+                  className="absolute inset-0 bg-[#1A1A1A] border border-white/10 rounded-2xl p-6 flex flex-col backface-hidden group-hover:[transform:rotateY(180deg)] transition-transform duration-700"
+                  style={{ backfaceVisibility: "hidden" }}
+                >
+                  {/* Badge */}
+                  <div className="absolute top-4 right-4 px-2.5 py-1 rounded-full bg-white/5 text-xs font-medium text-white/70 border border-white/10">
+                    {stat.badge}
                   </div>
 
-                  {/* Action button */}
+                  {/* Icon/Image */}
+                  <div className="flex items-center justify-center h-20 mb-4">
+                    <img 
+                      src={stat.image} 
+                      alt="" 
+                      className="w-16 h-16 object-contain"
+                    />
+                  </div>
+                  
+                  {/* Stats */}
+                  <div className="flex-1 flex flex-col justify-center text-center">
+                    <div 
+                      className="text-4xl font-bold mb-2"
+                      style={{ color: stat.color }}
+                    >
+                      {stat.value}
+                    </div>
+                    <div className="text-lg font-semibold text-white mb-1">
+                      {stat.label}
+                    </div>
+                    <div className="text-sm text-[#9CA3AF]">
+                      {stat.description}
+                    </div>
+                  </div>
+
+                  {/* Hover hint */}
+                  <div className="text-center text-xs text-white/40 mt-4">
+                    Hover to learn more
+                  </div>
+                </div>
+
+                {/* Back of card */}
+                <div 
+                  className="absolute inset-0 bg-[#1A1A1A] border border-white/10 rounded-2xl p-6 flex flex-col [transform:rotateY(180deg)] backface-hidden group-hover:[transform:rotateY(0deg)] transition-transform duration-700"
+                  style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
+                >
+                  {/* Accent line */}
+                  <div 
+                    className="w-12 h-1 rounded-full mb-6"
+                    style={{ backgroundColor: stat.color }}
+                  ></div>
+
+                  <h3 className="text-xl font-bold text-white mb-3">
+                    {stat.backTitle}
+                  </h3>
+                  
+                  <p className="text-[#9CA3AF] text-sm leading-relaxed flex-1">
+                    {stat.backDescription}
+                  </p>
+
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="mt-4 w-full glass-card border border-white/10 text-white hover:border-white/30 group/btn transition-all duration-300"
+                    className="mt-4 w-full bg-white/5 border border-white/10 text-white hover:bg-white/10 hover:text-white"
                   >
                     <span className="flex items-center gap-2">
                       Learn More
-                      <Sparkles className="w-4 h-4 group-hover/btn:rotate-12 transition-transform" />
+                      <ArrowRight className="w-4 h-4" />
                     </span>
                   </Button>
                 </div>
-
-                {/* Animated border */}
-                <div className={`absolute inset-0 rounded-3xl bg-gradient-to-r ${stat.gradient} opacity-0 group-hover:opacity-20 blur-xl transition-all duration-500`}></div>
               </div>
             </div>
           ))}
         </div>
 
         {/* Bottom CTA */}
-        <div className="text-center mt-16 animate-slide-up">
+        <div className="text-center mt-16">
           <p className="text-[#9CA3AF] mb-4">Ready to join them?</p>
           <Button 
             size="lg"
-            className="bg-gradient-to-r from-[#3B82F6] via-[#9333EA] to-[#EC4899] hover:shadow-neon transition-all duration-300 hover:scale-105 rounded-xl h-12 px-8"
+            className="bg-[#3B82F6] hover:bg-[#2563EB] text-white transition-colors duration-300 rounded-xl h-12 px-8"
           >
             Start Creating Now
           </Button>
