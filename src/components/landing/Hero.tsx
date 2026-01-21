@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Play } from "lucide-react";
 import { Link } from "react-router-dom";
 import heroDashboard from "@/assets/hero-dashboard-3d.png";
-import aiBrain from "@/assets/ai-brain-3d.png";
 
 const Hero = () => {
   return (
@@ -19,11 +18,7 @@ const Hero = () => {
         </div>
       </div>
 
-      {/* 3D AI Brain Animation */}
-      <div className="absolute top-10 right-10 w-64 h-64 opacity-30 animate-float hidden lg:block">
-        <img src={aiBrain} alt="" className="w-full h-full object-contain" />
-      </div>
-      
+
       {/* Floating particles */}
       <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-[#3B82F6] rounded-full animate-float opacity-60"></div>
       <div className="absolute top-1/3 right-1/3 w-3 h-3 bg-[#9333EA] rounded-full animate-float-delay opacity-40"></div>
