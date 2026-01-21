@@ -6,8 +6,6 @@ import usersNetwork from "@/assets/users-network-3d.png";
 import contentFlow from "@/assets/content-flow-3d.png";
 import globalReach from "@/assets/global-reach-3d.png";
 import uptimeBolt from "@/assets/uptime-bolt-3d.png";
-import floatGraphic1 from "@/assets/float-graphic-1.png";
-import floatGraphic2 from "@/assets/float-graphic-2.png";
 
 const Stats = () => {
   const [platformStats, setPlatformStats] = useState({
@@ -83,13 +81,6 @@ const Stats = () => {
         </div>
       </div>
 
-      {/* Floating graphics */}
-      <div className="absolute top-20 left-10 w-32 h-32 opacity-20 animate-float hidden lg:block">
-        <img src={floatGraphic1} alt="" className="w-full h-full object-contain" />
-      </div>
-      <div className="absolute bottom-20 right-10 w-40 h-40 opacity-20 animate-float-delay hidden lg:block">
-        <img src={floatGraphic2} alt="" className="w-full h-full object-contain" />
-      </div>
 
       <div className="container mx-auto px-6 relative z-10">
         {/* Section Header */}
