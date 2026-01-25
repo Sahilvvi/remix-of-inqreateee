@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -20,6 +20,23 @@ const WebsiteBuilderDemo = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [customPrompt, setCustomPrompt] = useState("");
   const [generatedHtml, setGeneratedHtml] = useState<string | null>(null);
+  const [cooldownUntil, setCooldownUntil] = useState<number | null>(null);
+
+  // Prevent double-click / multiple inflight requests even before React state updates.
+  const inflightRef = useRef(false);
+
+  const cooldownSecondsLeft = cooldownUntil
+    ? Math.max(0, Math.ceil((cooldownUntil - Date.now()) / 1000))
+    : 0;
+
+  useEffect(() => {
+    if (!cooldownUntil) return;
+    const id = window.setInterval(() => {
+      // force re-render while counting down
+      setCooldownUntil((prev) => (prev ? prev : null));
+    }, 500);
+    return () => window.clearInterval(id);
+  }, [cooldownUntil]);
 
   const steps = [
     { label: "Enter Prompt", active: currentStep >= 0 },
@@ -30,11 +47,17 @@ const WebsiteBuilderDemo = () => {
   ];
 
   const generateWebsite = async () => {
+    if (inflightRef.current) return;
+    if (cooldownUntil && Date.now() < cooldownUntil) {
+      toast.error(`Please wait ${cooldownSecondsLeft}s before trying again.`);
+      return;
+    }
     if (!customPrompt.trim()) {
       toast.error("Please enter a prompt describing your website");
       return;
     }
 
+    inflightRef.current = true;
     setIsGenerating(true);
     setCurrentStep(1);
 
@@ -68,7 +91,12 @@ const WebsiteBuilderDemo = () => {
         const errorMsg = error?.message || data?.error || '';
         
         if (errorMsg.includes('429') || errorMsg.includes('Rate limit')) {
-          toast.error('Demo is busy. Try again in a moment!');
+          // Prefer server-provided retry hint, fallback to a short cooldown.
+          const retryAfter = typeof data?.retry_after === 'number' && Number.isFinite(data.retry_after)
+            ? data.retry_after
+            : 10;
+          setCooldownUntil(Date.now() + retryAfter * 1000);
+          toast.error(`Demo is busy. Try again in ~${retryAfter}s.`);
         } else if (errorMsg.includes('402') || errorMsg.includes('Payment required') || errorMsg.includes('credits')) {
           toast.info('Demo limit reached! Sign up for unlimited website generation.', {
             action: {
@@ -97,6 +125,7 @@ const WebsiteBuilderDemo = () => {
       toast.error('Something went wrong. Please try again.');
       resetDemo();
     } finally {
+      inflightRef.current = false;
       setIsGenerating(false);
     }
   };
@@ -239,7 +268,7 @@ const WebsiteBuilderDemo = () => {
                 {!generatedHtml && (
                   <Button
                     onClick={generateWebsite}
-                    disabled={isGenerating || !customPrompt.trim()}
+                    disabled={isGenerating || !customPrompt.trim() || (cooldownUntil !== null && Date.now() < cooldownUntil)}
                     className="mt-6 w-full bg-gradient-to-r from-[#3B82F6] to-[#9333EA] hover:opacity-90 disabled:opacity-50"
                   >
                     {isGenerating ? (
@@ -247,6 +276,8 @@ const WebsiteBuilderDemo = () => {
                         <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                         Generating...
                       </>
+                    ) : cooldownUntil !== null && Date.now() < cooldownUntil ? (
+                      <>Please wait {cooldownSecondsLeft}s</>
                     ) : (
                       <>
                         <Wand2 className="w-4 h-4 mr-2" />
