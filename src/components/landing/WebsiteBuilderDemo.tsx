@@ -312,7 +312,7 @@ const WebsiteBuilderDemo = () => {
                 <Sparkles className="w-4 h-4 inline mr-1 text-[#9333EA]" />
                 {generatedHtml 
                   ? "✨ Website by Inqreate" 
-                  : "Powered by Lovable AI • Generate in seconds"}
+                  : "Powered by Inqreate AI • Generate in seconds"}
               </p>
               <Link to="/auth">
                 <Button className="bg-gradient-to-r from-[#3B82F6] to-[#9333EA] hover:opacity-90 text-sm">
