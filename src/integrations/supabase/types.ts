@@ -679,6 +679,96 @@ export type Database = {
         }
         Relationships: []
       }
+      website_audits: {
+        Row: {
+          accessibility_score: number | null
+          created_at: string | null
+          details: Json | null
+          id: string
+          mobile_score: number | null
+          overall_score: number | null
+          performance_score: number | null
+          security_score: number | null
+          seo_score: number | null
+          suggestions: Json | null
+          url: string
+          user_id: string
+        }
+        Insert: {
+          accessibility_score?: number | null
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          mobile_score?: number | null
+          overall_score?: number | null
+          performance_score?: number | null
+          security_score?: number | null
+          seo_score?: number | null
+          suggestions?: Json | null
+          url: string
+          user_id: string
+        }
+        Update: {
+          accessibility_score?: number | null
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          mobile_score?: number | null
+          overall_score?: number | null
+          performance_score?: number | null
+          security_score?: number | null
+          seo_score?: number | null
+          suggestions?: Json | null
+          url?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      website_projects: {
+        Row: {
+          created_at: string | null
+          css_content: string | null
+          customizations: Json | null
+          description: string | null
+          html_content: string | null
+          id: string
+          name: string
+          preview_url: string | null
+          status: string | null
+          template: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          css_content?: string | null
+          customizations?: Json | null
+          description?: string | null
+          html_content?: string | null
+          id?: string
+          name: string
+          preview_url?: string | null
+          status?: string | null
+          template: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          css_content?: string | null
+          customizations?: Json | null
+          description?: string | null
+          html_content?: string | null
+          id?: string
+          name?: string
+          preview_url?: string | null
+          status?: string | null
+          template?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
