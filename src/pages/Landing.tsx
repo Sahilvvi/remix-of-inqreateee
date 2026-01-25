@@ -5,6 +5,7 @@ import FeaturesGrid from "@/components/landing/FeaturesGrid";
 import LanguageSupport from "@/components/landing/LanguageSupport";
 import HowItWorks from "@/components/landing/HowItWorks";
 import BrandKitSection from "@/components/landing/BrandKitSection";
+import WebsiteTools from "@/components/landing/WebsiteTools";
 import UseCases from "@/components/landing/UseCases";
 import Testimonials from "@/components/landing/Testimonials";
 import Pricing from "@/components/landing/Pricing";
@@ -22,6 +23,7 @@ const Landing = () => {
       <LanguageSupport />
       <HowItWorks />
       <BrandKitSection />
+      <WebsiteTools />
       <UseCases />
       <Testimonials />
       <Pricing />
