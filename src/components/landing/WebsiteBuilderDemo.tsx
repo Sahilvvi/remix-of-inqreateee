@@ -1,16 +1,44 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Globe, Sparkles, Play, Pause, RotateCcw } from "lucide-react";
+import { Globe, Sparkles, Play, RotateCcw, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+
+const demoPrompts = [
+  {
+    prompt: "Create a modern portfolio website for a photographer with a dark theme, gallery section, and contact form.",
+    template: "portfolio",
+    businessType: "Photography Studio",
+    colorScheme: "#1a1a2e, #16213e, #0f3460, #e94560",
+    projectName: "PhotoStudio Pro"
+  },
+  {
+    prompt: "Build a clean restaurant website with menu, reservations, and location info using warm colors.",
+    template: "restaurant",
+    businessType: "Italian Restaurant",
+    colorScheme: "#2d2d2d, #d4a574, #8b4513, #f5f5dc",
+    projectName: "Bella Cucina"
+  },
+  {
+    prompt: "Design a tech startup landing page with modern gradients, feature cards, and pricing section.",
+    template: "startup",
+    businessType: "SaaS Company",
+    colorScheme: "#0a0a0a, #3b82f6, #8b5cf6, #06b6d4",
+    projectName: "TechFlow AI"
+  }
+];
 
 const WebsiteBuilderDemo = () => {
-  const [isPlaying, setIsPlaying] = useState(true);
+  const [isGenerating, setIsGenerating] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [typedText, setTypedText] = useState("");
-  const [showPreview, setShowPreview] = useState(false);
+  const [generatedHtml, setGeneratedHtml] = useState<string | null>(null);
+  const [currentPromptIndex, setCurrentPromptIndex] = useState(0);
+  const [autoPlay, setAutoPlay] = useState(true);
 
-  const demoPrompt = "Create a modern portfolio website for a photographer with a dark theme, gallery section, and contact form.";
+  const currentDemo = demoPrompts[currentPromptIndex];
   
   const steps = [
     { label: "Enter Prompt", active: currentStep >= 0 },
@@ -22,49 +50,105 @@ const WebsiteBuilderDemo = () => {
 
   // Typing animation
   useEffect(() => {
-    if (!isPlaying) return;
+    if (!autoPlay || isGenerating) return;
     
-    if (currentStep === 0 && typedText.length < demoPrompt.length) {
+    if (currentStep === 0 && typedText.length < currentDemo.prompt.length) {
       const timeout = setTimeout(() => {
-        setTypedText(demoPrompt.slice(0, typedText.length + 1));
-      }, 30);
+        setTypedText(currentDemo.prompt.slice(0, typedText.length + 1));
+      }, 25);
       return () => clearTimeout(timeout);
     }
     
-    if (currentStep === 0 && typedText.length === demoPrompt.length) {
-      const timeout = setTimeout(() => setCurrentStep(1), 500);
+    if (currentStep === 0 && typedText.length === currentDemo.prompt.length) {
+      const timeout = setTimeout(() => generateWebsite(), 800);
       return () => clearTimeout(timeout);
     }
-  }, [typedText, currentStep, isPlaying]);
+  }, [typedText, currentStep, autoPlay, isGenerating, currentDemo.prompt]);
 
-  // Step progression
+  // Auto-start typing on mount
   useEffect(() => {
-    if (!isPlaying || currentStep === 0) return;
-    
-    if (currentStep < 4) {
-      const timeout = setTimeout(() => setCurrentStep(prev => prev + 1), 1200);
+    if (autoPlay && currentStep === 0 && typedText.length === 0) {
+      const timeout = setTimeout(() => {
+        setTypedText(currentDemo.prompt.slice(0, 1));
+      }, 1000);
       return () => clearTimeout(timeout);
     }
-    
-    if (currentStep === 4 && !showPreview) {
-      const timeout = setTimeout(() => setShowPreview(true), 500);
-      return () => clearTimeout(timeout);
+  }, [autoPlay, currentStep, typedText.length, currentDemo.prompt]);
+
+  const generateWebsite = async () => {
+    setIsGenerating(true);
+    setCurrentStep(1);
+
+    try {
+      // Simulate step progression while generating
+      const stepInterval = setInterval(() => {
+        setCurrentStep(prev => {
+          if (prev < 3) return prev + 1;
+          return prev;
+        });
+      }, 1500);
+
+      const { data, error } = await supabase.functions.invoke('generate-website', {
+        body: {
+          template: currentDemo.template,
+          businessType: currentDemo.businessType,
+          colorScheme: currentDemo.colorScheme,
+          contentRequirements: currentDemo.prompt,
+          projectName: currentDemo.projectName
+        }
+      });
+
+      clearInterval(stepInterval);
+
+      if (error) {
+        console.error('Generation error:', error);
+        if (error.message?.includes('429') || error.message?.includes('Rate limit')) {
+          toast.error('Demo is busy. Try again in a moment!');
+        } else if (error.message?.includes('402')) {
+          toast.error('Demo credits exhausted. Sign up to generate your own!');
+        } else {
+          toast.error('Generation failed. Please try again.');
+        }
+        resetDemo();
+        return;
+      }
+
+      setCurrentStep(4);
+      
+      // Combine HTML and CSS for the iframe
+      const fullHtml = data.html?.includes('<style>') 
+        ? data.html 
+        : `${data.html}<style>${data.css || ''}</style>`;
+      
+      setGeneratedHtml(fullHtml);
+      
+    } catch (err) {
+      console.error('Error generating website:', err);
+      toast.error('Something went wrong. Please try again.');
+      resetDemo();
+    } finally {
+      setIsGenerating(false);
     }
-  }, [currentStep, isPlaying, showPreview]);
+  };
 
   const resetDemo = () => {
     setCurrentStep(0);
     setTypedText("");
-    setShowPreview(false);
-    setIsPlaying(true);
+    setGeneratedHtml(null);
+    setIsGenerating(false);
   };
 
-  const togglePlay = () => {
-    if (currentStep === 4 && showPreview) {
-      resetDemo();
-    } else {
-      setIsPlaying(!isPlaying);
+  const tryNextPrompt = () => {
+    resetDemo();
+    setCurrentPromptIndex((prev) => (prev + 1) % demoPrompts.length);
+    setAutoPlay(true);
+  };
+
+  const handleManualGenerate = () => {
+    if (typedText.length === 0) {
+      setTypedText(currentDemo.prompt);
     }
+    setTimeout(() => generateWebsite(), 100);
   };
 
   return (
@@ -82,10 +166,10 @@ const WebsiteBuilderDemo = () => {
             Live Demo
           </div>
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-            See <span className="bg-gradient-to-r from-[#3B82F6] to-[#9333EA] bg-clip-text text-transparent">AI Magic</span> in Action
+            See <span className="bg-gradient-to-r from-[#3B82F6] to-[#9333EA] bg-clip-text text-transparent">Real AI</span> Generation
           </h2>
           <p className="text-xl text-[#9CA3AF] max-w-2xl mx-auto">
-            Watch how our AI transforms a simple prompt into a stunning website
+            Watch our AI generate a real website in seconds — no mock preview, actual code!
           </p>
         </div>
 
@@ -100,23 +184,22 @@ const WebsiteBuilderDemo = () => {
                   <div className="w-3 h-3 rounded-full bg-[#F59E0B]"></div>
                   <div className="w-3 h-3 rounded-full bg-[#22C55E]"></div>
                 </div>
-                <span className="text-[#9CA3AF] text-sm font-medium">Website Builder Demo</span>
+                <span className="text-[#9CA3AF] text-sm font-medium">
+                  Live Website Generator • {currentDemo.projectName}
+                </span>
               </div>
               <div className="flex items-center gap-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={togglePlay}
-                  className="text-[#9CA3AF] hover:text-white"
-                >
-                  {currentStep === 4 && showPreview ? (
+                {generatedHtml && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={tryNextPrompt}
+                    className="text-[#9CA3AF] hover:text-white gap-1"
+                  >
                     <RotateCcw className="w-4 h-4" />
-                  ) : isPlaying ? (
-                    <Pause className="w-4 h-4" />
-                  ) : (
-                    <Play className="w-4 h-4" />
-                  )}
-                </Button>
+                    Try Another
+                  </Button>
+                )}
               </div>
             </div>
 
@@ -129,7 +212,7 @@ const WebsiteBuilderDemo = () => {
                   <div className="bg-[#0D0D0D] rounded-xl p-4 min-h-[100px] border border-white/10">
                     <p className="text-white">
                       {typedText}
-                      {currentStep === 0 && isPlaying && (
+                      {currentStep === 0 && !isGenerating && (
                         <span className="inline-block w-0.5 h-5 bg-[#3B82F6] ml-1 animate-pulse"></span>
                       )}
                     </p>
@@ -147,8 +230,10 @@ const WebsiteBuilderDemo = () => {
                             : "bg-[#2D2D2D] text-[#9CA3AF]"
                         }`}
                       >
-                        {step.active && currentStep === index ? (
-                          <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        {step.active && currentStep === index && isGenerating ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : step.active && currentStep > index ? (
+                          <span className="text-white">✓</span>
                         ) : (
                           index + 1
                         )}
@@ -160,64 +245,60 @@ const WebsiteBuilderDemo = () => {
                       >
                         {step.label}
                       </span>
-                      {step.active && currentStep > index && (
-                        <span className="text-[#22C55E] text-xs">✓</span>
-                      )}
                     </div>
                   ))}
                 </div>
+
+                {/* Manual Generate Button */}
+                {currentStep === 0 && !isGenerating && typedText.length === 0 && (
+                  <Button
+                    onClick={handleManualGenerate}
+                    className="mt-6 w-full bg-gradient-to-r from-[#3B82F6] to-[#9333EA] hover:opacity-90"
+                  >
+                    <Sparkles className="w-4 h-4 mr-2" />
+                    Generate Now
+                  </Button>
+                )}
               </div>
 
               {/* Preview Panel */}
               <div className="p-6 bg-[#0D0D0D]">
-                <label className="text-sm font-medium text-[#9CA3AF] mb-2 block">Live Preview</label>
+                <label className="text-sm font-medium text-[#9CA3AF] mb-2 block">
+                  Live Preview {generatedHtml && <span className="text-[#22C55E]">• Real Generated Code</span>}
+                </label>
                 <div
-                  className={`bg-[#1A1A1A] rounded-xl border border-white/10 h-[300px] overflow-hidden transition-all duration-700 ${
-                    showPreview ? "opacity-100" : "opacity-50"
+                  className={`bg-white rounded-xl border border-white/10 h-[300px] overflow-hidden transition-all duration-700 ${
+                    generatedHtml ? "opacity-100" : "opacity-50"
                   }`}
                 >
-                  {showPreview ? (
-                    <div className="w-full h-full animate-fade-in">
-                      {/* Mock Website Preview */}
-                      <div className="bg-gradient-to-br from-[#1a1a2e] to-[#16213e] h-full p-4 text-white">
-                        {/* Nav */}
-                        <div className="flex justify-between items-center mb-6">
-                          <span className="font-bold text-lg">📸 PhotoStudio</span>
-                          <div className="flex gap-4 text-xs text-[#9CA3AF]">
-                            <span>Gallery</span>
-                            <span>About</span>
-                            <span>Contact</span>
-                          </div>
-                        </div>
-                        {/* Hero */}
-                        <div className="text-center mb-4">
-                          <h3 className="text-xl font-bold mb-2">Capturing Moments</h3>
-                          <p className="text-xs text-[#9CA3AF]">Professional photography services</p>
-                        </div>
-                        {/* Gallery Grid */}
-                        <div className="grid grid-cols-3 gap-2 mb-4">
-                          {[1, 2, 3, 4, 5, 6].map((i) => (
-                            <div
-                              key={i}
-                              className="aspect-square rounded bg-gradient-to-br from-[#3B82F6]/30 to-[#9333EA]/30"
-                            ></div>
-                          ))}
-                        </div>
-                        {/* CTA */}
-                        <div className="text-center">
-                          <div className="inline-block px-4 py-1.5 rounded-full bg-gradient-to-r from-[#3B82F6] to-[#9333EA] text-xs font-medium">
-                            Get in Touch
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                  {generatedHtml ? (
+                    <iframe
+                      srcDoc={generatedHtml}
+                      className="w-full h-full border-0"
+                      title="Generated Website Preview"
+                      sandbox="allow-scripts"
+                    />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center">
+                    <div className="w-full h-full flex items-center justify-center bg-[#1A1A1A]">
                       <div className="text-center">
-                        <Globe className="w-12 h-12 text-[#3B82F6] mx-auto mb-3 opacity-50" />
-                        <p className="text-[#9CA3AF] text-sm">
-                          {currentStep > 0 ? "Generating..." : "Waiting for input..."}
-                        </p>
+                        {isGenerating ? (
+                          <>
+                            <Loader2 className="w-12 h-12 text-[#3B82F6] mx-auto mb-3 animate-spin" />
+                            <p className="text-[#9CA3AF] text-sm">
+                              AI is generating your website...
+                            </p>
+                            <p className="text-[#9CA3AF] text-xs mt-1">
+                              This takes about 10-15 seconds
+                            </p>
+                          </>
+                        ) : (
+                          <>
+                            <Globe className="w-12 h-12 text-[#3B82F6] mx-auto mb-3 opacity-50" />
+                            <p className="text-[#9CA3AF] text-sm">
+                              {typedText.length > 0 ? "Ready to generate..." : "Waiting for prompt..."}
+                            </p>
+                          </>
+                        )}
                       </div>
                     </div>
                   )}
@@ -229,7 +310,9 @@ const WebsiteBuilderDemo = () => {
             <div className="px-6 py-4 border-t border-white/10 bg-[#111111] flex items-center justify-between">
               <p className="text-[#9CA3AF] text-sm">
                 <Sparkles className="w-4 h-4 inline mr-1 text-[#9333EA]" />
-                Powered by AI • Generate in seconds
+                {generatedHtml 
+                  ? "✨ Real website generated with AI • Export as HTML/CSS" 
+                  : "Powered by Lovable AI • Generate in seconds"}
               </p>
               <Link to="/auth">
                 <Button className="bg-gradient-to-r from-[#3B82F6] to-[#9333EA] hover:opacity-90 text-sm">
@@ -238,6 +321,27 @@ const WebsiteBuilderDemo = () => {
               </Link>
             </div>
           </Card>
+
+          {/* Prompt Selector */}
+          <div className="flex justify-center gap-2 mt-6">
+            {demoPrompts.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => {
+                  if (index !== currentPromptIndex) {
+                    setCurrentPromptIndex(index);
+                    resetDemo();
+                    setAutoPlay(true);
+                  }
+                }}
+                className={`w-2.5 h-2.5 rounded-full transition-all ${
+                  index === currentPromptIndex 
+                    ? "bg-gradient-to-r from-[#3B82F6] to-[#9333EA] w-8" 
+                    : "bg-[#2D2D2D] hover:bg-[#3D3D3D]"
+                }`}
+              />
+            ))}
+          </div>
         </div>
       </div>
     </section>
