@@ -63,12 +63,19 @@ const WebsiteBuilderDemo = () => {
 
       clearInterval(stepInterval);
 
-      if (error) {
-        console.error('Generation error:', error);
-        if (error.message?.includes('429') || error.message?.includes('Rate limit')) {
+      if (error || data?.error) {
+        console.error('Generation error:', error || data?.error);
+        const errorMsg = error?.message || data?.error || '';
+        
+        if (errorMsg.includes('429') || errorMsg.includes('Rate limit')) {
           toast.error('Demo is busy. Try again in a moment!');
-        } else if (error.message?.includes('402')) {
-          toast.error('Demo credits exhausted. Sign up to generate your own!');
+        } else if (errorMsg.includes('402') || errorMsg.includes('Payment required') || errorMsg.includes('credits')) {
+          toast.info('Demo limit reached! Sign up for unlimited website generation.', {
+            action: {
+              label: 'Sign Up Free',
+              onClick: () => window.location.href = '/auth'
+            }
+          });
         } else {
           toast.error('Generation failed. Please try again.');
         }
