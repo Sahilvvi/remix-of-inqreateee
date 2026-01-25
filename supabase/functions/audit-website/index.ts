@@ -88,8 +88,8 @@ Based on typical best practices and common issues found on websites, generate re
 
 Provide specific, actionable recommendations for improvement.`;
 
-    const makeRequest = async () => {
-      return await fetch('https://api.openai.com/v1/chat/completions', {
+    const makeRequest = async (retryCount = 0): Promise<Response> => {
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${OPENAI_API_KEY}`,
@@ -103,33 +103,36 @@ Provide specific, actionable recommendations for improvement.`;
           ],
         }),
       });
+
+      // Handle rate limiting with exponential backoff
+      if (response.status === 429 && retryCount < 3) {
+        const waitTime = Math.pow(2, retryCount + 1) * 5000; // 10s, 20s, 40s
+        console.log(`Rate limited, waiting ${waitTime/1000} seconds before retry (attempt ${retryCount + 1}/3)...`);
+        await new Promise(resolve => setTimeout(resolve, waitTime));
+        return makeRequest(retryCount + 1);
+      }
+
+      return response;
     };
 
-    let response = await makeRequest();
-
-    // If rate limited, wait and retry once
-    if (response.status === 429) {
-      console.log('Rate limited, waiting 3 seconds before retry...');
-      await new Promise(resolve => setTimeout(resolve, 3000));
-      response = await makeRequest();
-    }
+    const response = await makeRequest();
 
     if (!response.ok) {
       if (response.status === 429) {
-        return new Response(JSON.stringify({ error: 'Rate limit exceeded. Please wait a moment and try again.', retry_after: 15 }), {
+        return new Response(JSON.stringify({ error: 'OpenAI rate limit exceeded. Please wait 30 seconds and try again.', retry_after: 30 }), {
           status: 429,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
       }
       if (response.status === 402) {
-        return new Response(JSON.stringify({ error: 'Payment required. Please add credits to continue.' }), {
+        return new Response(JSON.stringify({ error: 'Payment required. Please add credits to your OpenAI account.' }), {
           status: 402,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
       }
       const errorText = await response.text();
-      console.error('AI gateway error:', response.status, errorText);
-      throw new Error(`AI gateway error: ${response.status}`);
+      console.error('OpenAI API error:', response.status, errorText);
+      throw new Error(`OpenAI API error: ${response.status}`);
     }
 
     const data = await response.json();
