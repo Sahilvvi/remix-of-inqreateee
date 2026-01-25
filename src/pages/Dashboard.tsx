@@ -13,6 +13,8 @@ import BrandKitTeams from "@/components/dashboard/BrandKitTeams";
 import EcommerceContentTools from "@/components/dashboard/EcommerceContentTools";
 import AIImageGenerator from "@/components/dashboard/AIImageGenerator";
 import TemplatesLibrary from "@/components/dashboard/TemplatesLibrary";
+import WebsiteBuilder from "@/components/dashboard/WebsiteBuilder";
+import WebsiteAuditor from "@/components/dashboard/WebsiteAuditor";
 import Settings from "@/pages/Settings";
 import { Card } from "@/components/ui/card";
 
@@ -48,6 +50,10 @@ const Dashboard = () => {
         return <EcommerceGenerator />;
       case "ecommerce-tools":
         return <EcommerceContentTools />;
+      case "website-builder":
+        return <WebsiteBuilder />;
+      case "website-auditor":
+        return <WebsiteAuditor />;
       case "brand-kit":
         return <BrandKitTeams />;
       case "analytics":
