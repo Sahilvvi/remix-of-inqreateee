@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -98,6 +98,8 @@ const WebsiteAuditor = () => {
   const [isAuditing, setIsAuditing] = useState(false);
   const [url, setUrl] = useState("");
   const [currentAudit, setCurrentAudit] = useState<WebsiteAudit | null>(null);
+  const [cooldownUntil, setCooldownUntil] = useState<number | null>(null);
+  const inflightRef = useRef(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -139,12 +141,26 @@ const WebsiteAuditor = () => {
       return;
     }
 
+    // Prevent concurrent requests
+    if (inflightRef.current) {
+      toast({ title: "Please wait", description: "An audit is already in progress", variant: "destructive" });
+      return;
+    }
+
+    // Check cooldown
+    const cooldownSecondsLeft = cooldownUntil ? Math.ceil((cooldownUntil - Date.now()) / 1000) : 0;
+    if (cooldownUntil && Date.now() < cooldownUntil) {
+      toast({ title: "Rate limited", description: `Please wait ${cooldownSecondsLeft}s before trying again.`, variant: "destructive" });
+      return;
+    }
+
     // Basic URL validation
     let formattedUrl = url.trim();
     if (!formattedUrl.startsWith('http://') && !formattedUrl.startsWith('https://')) {
       formattedUrl = 'https://' + formattedUrl;
     }
 
+    inflightRef.current = true;
     setIsAuditing(true);
     setCurrentAudit(null);
 
@@ -201,12 +217,26 @@ const WebsiteAuditor = () => {
       await fetchAudits();
     } catch (error: any) {
       console.error('Error auditing website:', error);
-      toast({
-        title: "Audit failed",
-        description: error.message || "Failed to audit website",
-        variant: "destructive",
-      });
+      
+      // Handle rate limit with cooldown
+      const errorBody = error?.context?.body;
+      if (errorBody?.retry_after || error?.message?.includes('Rate limit')) {
+        const retryAfter = errorBody?.retry_after || 15;
+        setCooldownUntil(Date.now() + retryAfter * 1000);
+        toast({
+          title: "Rate limited",
+          description: `Please wait ${retryAfter} seconds before trying again.`,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Audit failed",
+          description: error.message || "Failed to audit website",
+          variant: "destructive",
+        });
+      }
     } finally {
+      inflightRef.current = false;
       setIsAuditing(false);
     }
   };
