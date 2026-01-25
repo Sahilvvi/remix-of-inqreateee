@@ -58,44 +58,66 @@ Generate a complete, single-page website with:
 
 Use the color scheme provided and make it visually stunning.`;
 
-    // Call Gemini API with retry for transient 429s
-    const callGemini = async () => {
-      return await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          contents: [
-            {
-              role: 'user',
-              parts: [{ text: `${systemPrompt}\n\n${userPrompt}` }]
-            }
-          ],
-          generationConfig: {
-            temperature: 0.7,
-            maxOutputTokens: 8192,
-          }
-        }),
-      });
+    // Call Gemini API with exponential backoff for transient 429s
+    const callGemini = async (): Promise<Response> => {
+      return await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            contents: [
+              {
+                role: 'user',
+                parts: [{ text: `${systemPrompt}\n\n${userPrompt}` }],
+              },
+            ],
+            generationConfig: {
+              temperature: 0.7,
+              maxOutputTokens: 8192,
+            },
+          }),
+        }
+      );
     };
 
-    let response = await callGemini();
-    if (response.status === 429) {
-      const retryAfterHeader = response.headers.get('retry-after');
-      const retryAfterSeconds = retryAfterHeader ? Number(retryAfterHeader) : NaN;
-      const waitMs = Number.isFinite(retryAfterSeconds) ? Math.max(1000, retryAfterSeconds * 1000) : 1500;
-      await new Promise((r) => setTimeout(r, Math.min(waitMs, 5000)));
-      response = await callGemini();
-    }
+    const parseRetryAfterSeconds = (resp: Response): number | null => {
+      const retryAfterHeader = resp.headers.get('retry-after');
+      if (!retryAfterHeader) return null;
+      const retryAfterSeconds = Number(retryAfterHeader);
+      return Number.isFinite(retryAfterSeconds) && retryAfterSeconds > 0 ? retryAfterSeconds : null;
+    };
+
+    const makeRequest = async (retryCount = 0): Promise<Response> => {
+      const resp = await callGemini();
+
+      if (resp.status !== 429) return resp;
+      if (retryCount >= 3) return resp;
+
+      // Prefer server-provided hint, otherwise use exponential backoff.
+      const retryAfterSeconds = parseRetryAfterSeconds(resp);
+      const backoffMs = Math.pow(2, retryCount + 1) * 5000; // 10s, 20s, 40s
+      const waitMs = retryAfterSeconds ? retryAfterSeconds * 1000 : backoffMs;
+      const cappedWaitMs = Math.min(Math.max(waitMs, 1000), 45000);
+
+      console.log(
+        `Gemini rate limited (429). Waiting ${Math.round(cappedWaitMs / 1000)}s before retry (attempt ${retryCount + 1}/3)...`
+      );
+      await new Promise((r) => setTimeout(r, cappedWaitMs));
+      return makeRequest(retryCount + 1);
+    };
+
+    const response = await makeRequest();
 
     if (!response.ok) {
       if (response.status === 429) {
-        const retryAfterHeader = response.headers.get('retry-after');
-        const retryAfterSeconds = retryAfterHeader ? Number(retryAfterHeader) : null;
+        const retryAfterSeconds = parseRetryAfterSeconds(response);
         return new Response(JSON.stringify({
           error: 'Rate limit exceeded. Please try again later.',
-          retry_after: Number.isFinite(retryAfterSeconds as number) ? retryAfterSeconds : null,
+          // Ensure client can show a countdown even when provider doesn't send retry-after.
+          retry_after: retryAfterSeconds ?? 30,
         }), {
           status: 429,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
