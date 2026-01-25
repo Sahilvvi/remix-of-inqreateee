@@ -61,14 +61,16 @@ const Hero = () => {
                 </Button>
               </Link>
               
-              <Button 
-                size="lg" 
-                variant="outline"
-                className="group h-14 px-8 text-lg font-semibold glass-card hover-glow border-2 border-[#3B82F6]/50 text-white rounded-xl transition-all duration-300"
-              >
-                <Play className="mr-2 w-5 h-5" />
-                See Demo
-              </Button>
+              <Link to="/contact">
+                <Button 
+                  size="lg" 
+                  variant="outline"
+                  className="group h-14 px-8 text-lg font-semibold glass-card hover-glow border-2 border-[#3B82F6]/50 text-white rounded-xl transition-all duration-300"
+                >
+                  <Play className="mr-2 w-5 h-5" />
+                  See Demo
+                </Button>
+              </Link>
             </div>
           </div>
 

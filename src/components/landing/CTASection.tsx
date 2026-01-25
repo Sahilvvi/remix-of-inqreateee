@@ -42,13 +42,15 @@ const CTASection = () => {
               </Button>
             </Link>
             
-            <Button 
-              size="lg" 
-              variant="outline"
-              className="h-14 sm:h-16 px-8 sm:px-10 text-lg sm:text-xl font-bold glass-card hover-glow border-2 border-primary/50 transition-all duration-300 w-full sm:w-auto"
-            >
-              See Demo
-            </Button>
+            <Link to="/contact" className="w-full sm:w-auto">
+              <Button 
+                size="lg" 
+                variant="outline"
+                className="h-14 sm:h-16 px-8 sm:px-10 text-lg sm:text-xl font-bold glass-card hover-glow border-2 border-primary/50 transition-all duration-300 w-full sm:w-auto"
+              >
+                See Demo
+              </Button>
+            </Link>
           </div>
 
           {/* Trust indicators */}
