@@ -13,9 +13,9 @@ serve(async (req) => {
   try {
     const { template, businessType, colorScheme, contentRequirements, projectName } = await req.json();
 
-    const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
-    if (!OPENAI_API_KEY) {
-      throw new Error('OPENAI_API_KEY is not configured');
+    const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY_WEBSITE');
+    if (!GEMINI_API_KEY) {
+      throw new Error('GEMINI_API_KEY_WEBSITE is not configured');
     }
 
     console.log('Generating website for:', { template, businessType, projectName });
@@ -58,32 +58,35 @@ Generate a complete, single-page website with:
 
 Use the color scheme provided and make it visually stunning.`;
 
-    // Small retry to smooth over transient 429s (OpenAI can briefly throttle bursts).
-    const callOpenAI = async () => {
-      return await fetch('https://api.openai.com/v1/chat/completions', {
+    // Call Gemini API with retry for transient 429s
+    const callGemini = async () => {
+      return await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${OPENAI_API_KEY}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'gpt-4o-mini',
-          messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: userPrompt }
+          contents: [
+            {
+              role: 'user',
+              parts: [{ text: `${systemPrompt}\n\n${userPrompt}` }]
+            }
           ],
-          response_format: { type: "json_object" },
+          generationConfig: {
+            temperature: 0.7,
+            maxOutputTokens: 8192,
+          }
         }),
       });
     };
 
-    let response = await callOpenAI();
+    let response = await callGemini();
     if (response.status === 429) {
       const retryAfterHeader = response.headers.get('retry-after');
       const retryAfterSeconds = retryAfterHeader ? Number(retryAfterHeader) : NaN;
       const waitMs = Number.isFinite(retryAfterSeconds) ? Math.max(1000, retryAfterSeconds * 1000) : 1500;
       await new Promise((r) => setTimeout(r, Math.min(waitMs, 5000)));
-      response = await callOpenAI();
+      response = await callGemini();
     }
 
     if (!response.ok) {
@@ -98,25 +101,25 @@ Use the color scheme provided and make it visually stunning.`;
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
       }
-      if (response.status === 402 || response.status === 401) {
-        return new Response(JSON.stringify({ error: 'OpenAI API key issue. Please check your API key.' }), {
+      if (response.status === 400 || response.status === 401) {
+        return new Response(JSON.stringify({ error: 'Gemini API key issue. Please check your API key.' }), {
           status: 402,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
       }
       const errorText = await response.text();
-      console.error('OpenAI API error:', response.status, errorText);
-      throw new Error(`OpenAI API error: ${response.status}`);
+      console.error('Gemini API error:', response.status, errorText);
+      throw new Error(`Gemini API error: ${response.status}`);
     }
 
     const data = await response.json();
-    const content = data.choices?.[0]?.message?.content;
+    const content = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
     if (!content) {
-      throw new Error('No content returned from AI');
+      throw new Error('No content returned from Gemini');
     }
 
-    console.log('AI response received, parsing...');
+    console.log('Gemini response received, parsing...');
 
     // Try to parse the JSON response
     let result;
