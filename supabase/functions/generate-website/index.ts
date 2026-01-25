@@ -13,9 +13,9 @@ serve(async (req) => {
   try {
     const { template, businessType, colorScheme, contentRequirements, projectName } = await req.json();
 
-    const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY_WEBSITE');
-    if (!GEMINI_API_KEY) {
-      throw new Error('GEMINI_API_KEY_WEBSITE is not configured');
+    const GROQ_API_KEY = Deno.env.get('GROQ_API_KEY');
+    if (!GROQ_API_KEY) {
+      throw new Error('GROQ_API_KEY is not configured');
     }
 
     console.log('Generating website for:', { template, businessType, projectName });
@@ -58,54 +58,36 @@ Generate a complete, single-page website with:
 
 Use the color scheme provided and make it visually stunning.`;
 
-    // Call Gemini API with exponential backoff for transient 429s
-    const callGemini = async (): Promise<Response> => {
-      return await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            contents: [
-              {
-                role: 'user',
-                parts: [{ text: `${systemPrompt}\n\n${userPrompt}` }],
-              },
-            ],
-            generationConfig: {
-              temperature: 0.7,
-              maxOutputTokens: 8192,
-            },
-          }),
-        }
-      );
-    };
-
-    const parseRetryAfterSeconds = (resp: Response): number | null => {
-      const retryAfterHeader = resp.headers.get('retry-after');
-      if (!retryAfterHeader) return null;
-      const retryAfterSeconds = Number(retryAfterHeader);
-      return Number.isFinite(retryAfterSeconds) && retryAfterSeconds > 0 ? retryAfterSeconds : null;
+    // Call Groq API with retry logic
+    const callGroq = async (): Promise<Response> => {
+      return await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${GROQ_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'llama-3.3-70b-versatile',
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: userPrompt }
+          ],
+          temperature: 0.7,
+          max_tokens: 8192,
+        }),
+      });
     };
 
     const makeRequest = async (retryCount = 0): Promise<Response> => {
-      const resp = await callGemini();
+      const resp = await callGroq();
 
       if (resp.status !== 429) return resp;
       if (retryCount >= 3) return resp;
 
-      // Prefer server-provided hint, otherwise use exponential backoff.
-      const retryAfterSeconds = parseRetryAfterSeconds(resp);
-      const backoffMs = Math.pow(2, retryCount + 1) * 5000; // 10s, 20s, 40s
-      const waitMs = retryAfterSeconds ? retryAfterSeconds * 1000 : backoffMs;
-      const cappedWaitMs = Math.min(Math.max(waitMs, 1000), 45000);
-
-      console.log(
-        `Gemini rate limited (429). Waiting ${Math.round(cappedWaitMs / 1000)}s before retry (attempt ${retryCount + 1}/3)...`
-      );
-      await new Promise((r) => setTimeout(r, cappedWaitMs));
+      // Exponential backoff: 5s, 10s, 20s
+      const backoffMs = Math.pow(2, retryCount) * 5000;
+      console.log(`Groq rate limited (429). Waiting ${backoffMs / 1000}s before retry (attempt ${retryCount + 1}/3)...`);
+      await new Promise((r) => setTimeout(r, backoffMs));
       return makeRequest(retryCount + 1);
     };
 
@@ -113,35 +95,33 @@ Use the color scheme provided and make it visually stunning.`;
 
     if (!response.ok) {
       if (response.status === 429) {
-        const retryAfterSeconds = parseRetryAfterSeconds(response);
         return new Response(JSON.stringify({
           error: 'Rate limit exceeded. Please try again later.',
-          // Ensure client can show a countdown even when provider doesn't send retry-after.
-          retry_after: retryAfterSeconds ?? 30,
+          retry_after: 30,
         }), {
           status: 429,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
       }
-      if (response.status === 400 || response.status === 401) {
-        return new Response(JSON.stringify({ error: 'Gemini API key issue. Please check your API key.' }), {
-          status: 402,
+      if (response.status === 401) {
+        return new Response(JSON.stringify({ error: 'Groq API key is invalid. Please check your API key.' }), {
+          status: 401,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
       }
       const errorText = await response.text();
-      console.error('Gemini API error:', response.status, errorText);
-      throw new Error(`Gemini API error: ${response.status}`);
+      console.error('Groq API error:', response.status, errorText);
+      throw new Error(`Groq API error: ${response.status}`);
     }
 
     const data = await response.json();
-    const content = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    const content = data.choices?.[0]?.message?.content;
 
     if (!content) {
-      throw new Error('No content returned from Gemini');
+      throw new Error('No content returned from Groq');
     }
 
-    console.log('Gemini response received, parsing...');
+    console.log('Groq response received, parsing...');
 
     // Try to parse the JSON response
     let result;
