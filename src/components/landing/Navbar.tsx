@@ -29,6 +29,28 @@ const Navbar = () => {
     { label: "Pricing", href: "#pricing" },
   ];
 
+  const handleSmoothScroll = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    e.preventDefault();
+    const targetId = href.replace('#', '');
+    const element = document.getElementById(targetId);
+    
+    if (element) {
+      const navbarHeight = 80;
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - navbarHeight;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      });
+    } else if (targetId === 'home') {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }
+  };
+
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
@@ -52,7 +74,8 @@ const Navbar = () => {
               <a
                 key={item.label}
                 href={item.href}
-                className="text-[#9CA3AF] hover:text-white transition-colors font-medium"
+                onClick={(e) => handleSmoothScroll(e, item.href)}
+                className="text-[#9CA3AF] hover:text-white transition-colors font-medium cursor-pointer"
               >
                 {item.label}
               </a>
@@ -81,8 +104,11 @@ const Navbar = () => {
                   <SheetClose asChild key={item.label}>
                     <a
                       href={item.href}
-                      className="text-lg text-[#9CA3AF] hover:text-white transition-colors font-medium py-2"
-                      onClick={() => setIsOpen(false)}
+                      className="text-lg text-[#9CA3AF] hover:text-white transition-colors font-medium py-2 cursor-pointer"
+                      onClick={(e) => {
+                        handleSmoothScroll(e, item.href);
+                        setIsOpen(false);
+                      }}
                     >
                       {item.label}
                     </a>
