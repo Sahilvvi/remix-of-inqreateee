@@ -13,6 +13,8 @@ import Blog from "./pages/Blog";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import Contact from "./pages/Contact";
+import WebsiteBuilderFeature from "./pages/features/WebsiteBuilderFeature";
+import WebsiteAuditorFeature from "./pages/features/WebsiteAuditorFeature";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -34,6 +36,8 @@ const App = () => (
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/terms" element={<TermsOfService />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/features/website-builder" element={<WebsiteBuilderFeature />} />
+          <Route path="/features/website-auditor" element={<WebsiteAuditorFeature />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

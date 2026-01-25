@@ -16,6 +16,7 @@ const WebsiteTools = () => {
         { icon: Zap, text: "Export HTML/CSS" },
       ],
       cta: "Build Your Website",
+      learnMoreLink: "/features/website-builder",
     },
     {
       icon: ClipboardCheck,
@@ -28,6 +29,7 @@ const WebsiteTools = () => {
         { icon: Shield, text: "Security Checks" },
       ],
       cta: "Audit Your Website",
+      learnMoreLink: "/features/website-auditor",
     },
   ];
 
@@ -91,13 +93,20 @@ const WebsiteTools = () => {
                     })}
                   </div>
 
-                  {/* CTA Button */}
-                  <Link to="/auth">
-                    <Button className={`w-full h-12 bg-gradient-to-r ${tool.gradient} hover:opacity-90 text-white font-semibold rounded-xl group/btn transition-all duration-300`}>
-                      {tool.cta}
-                      <ArrowRight className="w-4 h-4 ml-2 group-hover/btn:translate-x-1 transition-transform" />
-                    </Button>
-                  </Link>
+                  {/* CTA Buttons */}
+                  <div className="flex gap-3">
+                    <Link to="/auth" className="flex-1">
+                      <Button className={`w-full h-12 bg-gradient-to-r ${tool.gradient} hover:opacity-90 text-white font-semibold rounded-xl group/btn transition-all duration-300`}>
+                        {tool.cta}
+                        <ArrowRight className="w-4 h-4 ml-2 group-hover/btn:translate-x-1 transition-transform" />
+                      </Button>
+                    </Link>
+                    <Link to={tool.learnMoreLink}>
+                      <Button variant="outline" className="h-12 px-4 border-white/20 hover:bg-white/5 rounded-xl">
+                        Learn More
+                      </Button>
+                    </Link>
+                  </div>
                 </CardContent>
               </Card>
             );
