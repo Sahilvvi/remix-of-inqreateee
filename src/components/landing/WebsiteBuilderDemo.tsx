@@ -311,7 +311,7 @@ const WebsiteBuilderDemo = () => {
               <p className="text-[#9CA3AF] text-sm">
                 <Sparkles className="w-4 h-4 inline mr-1 text-[#9333EA]" />
                 {generatedHtml 
-                  ? "✨ Real website generated with AI • Export as HTML/CSS" 
+                  ? "✨ Website by Inqreate" 
                   : "Powered by Lovable AI • Generate in seconds"}
               </p>
               <Link to="/auth">
