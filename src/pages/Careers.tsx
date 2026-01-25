@@ -124,10 +124,12 @@ const Careers = () => {
                         </span>
                       </div>
                     </div>
-                    <Button variant="outline" className="group-hover:bg-[#9333EA] group-hover:text-white group-hover:border-[#9333EA] transition-all">
-                      Apply Now
-                      <ArrowRight className="w-4 h-4 ml-2" />
-                    </Button>
+                    <Link to="/contact">
+                      <Button variant="outline" className="group-hover:bg-[#9333EA] group-hover:text-white group-hover:border-[#9333EA] transition-all">
+                        Apply Now
+                        <ArrowRight className="w-4 h-4 ml-2" />
+                      </Button>
+                    </Link>
                   </div>
                 </CardContent>
               </Card>
@@ -143,9 +145,11 @@ const Careers = () => {
           <p className="text-[#9CA3AF] mb-6 max-w-xl mx-auto">
             We're always looking for talented people. Send us your resume and we'll keep you in mind for future opportunities.
           </p>
-          <Button variant="outline" className="hover:bg-[#9333EA] hover:text-white hover:border-[#9333EA]">
-            Send Open Application
-          </Button>
+          <Link to="/contact">
+            <Button variant="outline" className="hover:bg-[#9333EA] hover:text-white hover:border-[#9333EA]">
+              Send Open Application
+            </Button>
+          </Link>
         </div>
       </section>
 

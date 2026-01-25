@@ -1,9 +1,10 @@
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Check, Star, Zap, Crown } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Pricing = () => {
+  const navigate = useNavigate();
   const plans = [
     {
       name: "Free",
@@ -163,18 +164,17 @@ const Pricing = () => {
                 </CardHeader>
 
                 <CardContent>
-                  <Link to="/auth">
-                    <Button
-                      className={`w-full mb-6 h-12 text-base font-semibold ${
-                        plan.highlight
-                          ? "bg-gradient-to-r from-primary via-secondary to-accent hover:shadow-neon"
-                          : "bg-gradient-to-r from-primary to-secondary hover-lift"
-                      }`}
-                      size="lg"
-                    >
-                      {plan.cta}
-                    </Button>
-                  </Link>
+                  <Button
+                    onClick={() => plan.cta === "Contact Sales" ? navigate("/contact") : navigate("/auth")}
+                    className={`w-full mb-6 h-12 text-base font-semibold ${
+                      plan.highlight
+                        ? "bg-gradient-to-r from-primary via-secondary to-accent hover:shadow-neon"
+                        : "bg-gradient-to-r from-primary to-secondary hover-lift"
+                    }`}
+                    size="lg"
+                  >
+                    {plan.cta}
+                  </Button>
 
                   <div className="space-y-3">
                     {plan.features.map((feature, idx) => (
@@ -200,9 +200,11 @@ const Pricing = () => {
               <p className="font-bold text-lg">Need Custom Enterprise Solution?</p>
               <p className="text-muted-foreground text-sm">Contact us for volume discounts, custom integrations, and dedicated support.</p>
             </div>
-            <Button variant="outline" className="hover-glow">
-              Contact Sales
-            </Button>
+            <Link to="/contact">
+              <Button variant="outline" className="hover-glow">
+                Contact Sales
+              </Button>
+            </Link>
           </div>
         </div>
       </div>

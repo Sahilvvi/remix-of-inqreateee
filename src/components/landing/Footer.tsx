@@ -42,7 +42,7 @@ const Footer = () => {
             </p>
             <div className="flex gap-4">
               <a
-                href="https://linkedin.com"
+                href="https://linkedin.com/company/inqreate"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-3 rounded-xl glass-card hover-glow border border-[#2D2D2D] transition-all duration-300"
@@ -50,7 +50,7 @@ const Footer = () => {
                 <Linkedin className="w-5 h-5 text-[#3B82F6]" />
               </a>
               <a
-                href="https://youtube.com"
+                href="https://youtube.com/@inqreate"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-3 rounded-xl glass-card hover-glow border border-[#2D2D2D] transition-all duration-300"
@@ -58,7 +58,7 @@ const Footer = () => {
                 <Youtube className="w-5 h-5 text-[#EC4899]" />
               </a>
               <a
-                href="https://twitter.com"
+                href="https://twitter.com/inqreate"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-3 rounded-xl glass-card hover-glow border border-[#2D2D2D] transition-all duration-300"
