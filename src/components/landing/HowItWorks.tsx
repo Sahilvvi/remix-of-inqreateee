@@ -37,7 +37,7 @@ const HowItWorks = () => {
   ];
 
   return (
-    <section className="relative py-32 overflow-hidden">
+    <section id="how-it-works" className="relative py-32 overflow-hidden">
       {/* Background effects */}
       <div className="absolute inset-0 bg-gradient-to-b from-background via-accent/5 to-background"></div>
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary rounded-full blur-3xl opacity-20 animate-pulse-slow"></div>
