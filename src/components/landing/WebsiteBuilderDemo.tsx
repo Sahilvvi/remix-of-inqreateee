@@ -1,45 +1,26 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Globe, Sparkles, Play, RotateCcw, Loader2 } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { Globe, Sparkles, Play, RotateCcw, Loader2, Wand2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-const demoPrompts = [
-  {
-    prompt: "Create a modern portfolio website for a photographer with a dark theme, gallery section, and contact form.",
-    template: "portfolio",
-    businessType: "Photography Studio",
-    colorScheme: "#1a1a2e, #16213e, #0f3460, #e94560",
-    projectName: "PhotoStudio Pro"
-  },
-  {
-    prompt: "Build a clean restaurant website with menu, reservations, and location info using warm colors.",
-    template: "restaurant",
-    businessType: "Italian Restaurant",
-    colorScheme: "#2d2d2d, #d4a574, #8b4513, #f5f5dc",
-    projectName: "Bella Cucina"
-  },
-  {
-    prompt: "Design a tech startup landing page with modern gradients, feature cards, and pricing section.",
-    template: "startup",
-    businessType: "SaaS Company",
-    colorScheme: "#0a0a0a, #3b82f6, #8b5cf6, #06b6d4",
-    projectName: "TechFlow AI"
-  }
+const examplePrompts = [
+  "Create a modern portfolio website for a photographer with a dark theme and gallery",
+  "Build a restaurant website with menu, reservations, and warm colors",
+  "Design a tech startup landing page with gradients and pricing section",
+  "Make an e-commerce store for handmade jewelry with elegant styling",
+  "Create a fitness gym website with membership plans and class schedules",
 ];
 
 const WebsiteBuilderDemo = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
-  const [typedText, setTypedText] = useState("");
+  const [customPrompt, setCustomPrompt] = useState("");
   const [generatedHtml, setGeneratedHtml] = useState<string | null>(null);
-  const [currentPromptIndex, setCurrentPromptIndex] = useState(0);
-  const [autoPlay, setAutoPlay] = useState(true);
 
-  const currentDemo = demoPrompts[currentPromptIndex];
-  
   const steps = [
     { label: "Enter Prompt", active: currentStep >= 0 },
     { label: "AI Processing", active: currentStep >= 1 },
@@ -48,34 +29,12 @@ const WebsiteBuilderDemo = () => {
     { label: "Preview Ready", active: currentStep >= 4 },
   ];
 
-  // Typing animation
-  useEffect(() => {
-    if (!autoPlay || isGenerating) return;
-    
-    if (currentStep === 0 && typedText.length < currentDemo.prompt.length) {
-      const timeout = setTimeout(() => {
-        setTypedText(currentDemo.prompt.slice(0, typedText.length + 1));
-      }, 25);
-      return () => clearTimeout(timeout);
-    }
-    
-    if (currentStep === 0 && typedText.length === currentDemo.prompt.length) {
-      const timeout = setTimeout(() => generateWebsite(), 800);
-      return () => clearTimeout(timeout);
-    }
-  }, [typedText, currentStep, autoPlay, isGenerating, currentDemo.prompt]);
-
-  // Auto-start typing on mount
-  useEffect(() => {
-    if (autoPlay && currentStep === 0 && typedText.length === 0) {
-      const timeout = setTimeout(() => {
-        setTypedText(currentDemo.prompt.slice(0, 1));
-      }, 1000);
-      return () => clearTimeout(timeout);
-    }
-  }, [autoPlay, currentStep, typedText.length, currentDemo.prompt]);
-
   const generateWebsite = async () => {
+    if (!customPrompt.trim()) {
+      toast.error("Please enter a prompt describing your website");
+      return;
+    }
+
     setIsGenerating(true);
     setCurrentStep(1);
 
@@ -88,13 +47,17 @@ const WebsiteBuilderDemo = () => {
         });
       }, 1500);
 
+      // Extract business type from prompt
+      const businessType = customPrompt.split(" ").slice(0, 5).join(" ");
+      const projectName = "Custom Website";
+
       const { data, error } = await supabase.functions.invoke('generate-website', {
         body: {
-          template: currentDemo.template,
-          businessType: currentDemo.businessType,
-          colorScheme: currentDemo.colorScheme,
-          contentRequirements: currentDemo.prompt,
-          projectName: currentDemo.projectName
+          template: "custom",
+          businessType: businessType,
+          colorScheme: "#0a0a0a, #3b82f6, #9333ea, #22c55e",
+          contentRequirements: customPrompt,
+          projectName: projectName
         }
       });
 
@@ -133,22 +96,17 @@ const WebsiteBuilderDemo = () => {
 
   const resetDemo = () => {
     setCurrentStep(0);
-    setTypedText("");
     setGeneratedHtml(null);
     setIsGenerating(false);
   };
 
-  const tryNextPrompt = () => {
+  const handleTryAgain = () => {
     resetDemo();
-    setCurrentPromptIndex((prev) => (prev + 1) % demoPrompts.length);
-    setAutoPlay(true);
+    setCustomPrompt("");
   };
 
-  const handleManualGenerate = () => {
-    if (typedText.length === 0) {
-      setTypedText(currentDemo.prompt);
-    }
-    setTimeout(() => generateWebsite(), 100);
+  const handleExampleClick = (example: string) => {
+    setCustomPrompt(example);
   };
 
   return (
@@ -166,10 +124,10 @@ const WebsiteBuilderDemo = () => {
             Live Demo
           </div>
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-            See <span className="bg-gradient-to-r from-[#3B82F6] to-[#9333EA] bg-clip-text text-transparent">Real AI</span> Generation
+            Try <span className="bg-gradient-to-r from-[#3B82F6] to-[#9333EA] bg-clip-text text-transparent">AI Website Builder</span>
           </h2>
           <p className="text-xl text-[#9CA3AF] max-w-2xl mx-auto">
-            Watch our AI generate a real website in seconds — no mock preview, actual code!
+            Enter your own prompt and watch our AI generate a real website in seconds!
           </p>
         </div>
 
@@ -185,7 +143,7 @@ const WebsiteBuilderDemo = () => {
                   <div className="w-3 h-3 rounded-full bg-[#22C55E]"></div>
                 </div>
                 <span className="text-[#9CA3AF] text-sm font-medium">
-                  Live Website Generator • {currentDemo.projectName}
+                  Live Website Generator
                 </span>
               </div>
               <div className="flex items-center gap-2">
@@ -193,11 +151,11 @@ const WebsiteBuilderDemo = () => {
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={tryNextPrompt}
+                    onClick={handleTryAgain}
                     className="text-[#9CA3AF] hover:text-white gap-1"
                   >
                     <RotateCcw className="w-4 h-4" />
-                    Try Another
+                    Try Again
                   </Button>
                 )}
               </div>
@@ -208,16 +166,37 @@ const WebsiteBuilderDemo = () => {
               {/* Input Panel */}
               <div className="p-6 border-r border-white/10">
                 <div className="mb-4">
-                  <label className="text-sm font-medium text-[#9CA3AF] mb-2 block">Your Prompt</label>
-                  <div className="bg-[#0D0D0D] rounded-xl p-4 min-h-[100px] border border-white/10">
-                    <p className="text-white">
-                      {typedText}
-                      {currentStep === 0 && !isGenerating && (
-                        <span className="inline-block w-0.5 h-5 bg-[#3B82F6] ml-1 animate-pulse"></span>
-                      )}
-                    </p>
-                  </div>
+                  <label className="text-sm font-medium text-[#9CA3AF] mb-2 block">
+                    Describe Your Website
+                  </label>
+                  <Textarea
+                    value={customPrompt}
+                    onChange={(e) => setCustomPrompt(e.target.value)}
+                    placeholder="E.g., Create a modern portfolio website for a photographer with a dark theme, gallery section, and contact form..."
+                    className="bg-[#0D0D0D] border-white/10 text-white placeholder:text-[#6B7280] min-h-[100px] resize-none focus:border-[#3B82F6] focus:ring-[#3B82F6]/20"
+                    disabled={isGenerating || !!generatedHtml}
+                  />
                 </div>
+
+                {/* Example Prompts */}
+                {!generatedHtml && !isGenerating && (
+                  <div className="mb-4">
+                    <label className="text-xs font-medium text-[#6B7280] mb-2 block">
+                      Try an example:
+                    </label>
+                    <div className="flex flex-wrap gap-2">
+                      {examplePrompts.slice(0, 3).map((example, index) => (
+                        <button
+                          key={index}
+                          onClick={() => handleExampleClick(example)}
+                          className="text-xs px-3 py-1.5 rounded-full bg-[#2D2D2D] text-[#9CA3AF] hover:bg-[#3D3D3D] hover:text-white transition-colors truncate max-w-[200px]"
+                        >
+                          {example.slice(0, 40)}...
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 {/* Progress Steps */}
                 <div className="space-y-3 mt-6">
@@ -249,14 +228,24 @@ const WebsiteBuilderDemo = () => {
                   ))}
                 </div>
 
-                {/* Manual Generate Button */}
-                {currentStep === 0 && !isGenerating && typedText.length === 0 && (
+                {/* Generate Button */}
+                {!generatedHtml && (
                   <Button
-                    onClick={handleManualGenerate}
-                    className="mt-6 w-full bg-gradient-to-r from-[#3B82F6] to-[#9333EA] hover:opacity-90"
+                    onClick={generateWebsite}
+                    disabled={isGenerating || !customPrompt.trim()}
+                    className="mt-6 w-full bg-gradient-to-r from-[#3B82F6] to-[#9333EA] hover:opacity-90 disabled:opacity-50"
                   >
-                    <Sparkles className="w-4 h-4 mr-2" />
-                    Generate Now
+                    {isGenerating ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Generating...
+                      </>
+                    ) : (
+                      <>
+                        <Wand2 className="w-4 h-4 mr-2" />
+                        Generate Website
+                      </>
+                    )}
                   </Button>
                 )}
               </div>
@@ -295,7 +284,7 @@ const WebsiteBuilderDemo = () => {
                           <>
                             <Globe className="w-12 h-12 text-[#3B82F6] mx-auto mb-3 opacity-50" />
                             <p className="text-[#9CA3AF] text-sm">
-                              {typedText.length > 0 ? "Ready to generate..." : "Waiting for prompt..."}
+                              {customPrompt.trim() ? "Click 'Generate Website' to start" : "Enter a prompt to get started"}
                             </p>
                           </>
                         )}
@@ -321,27 +310,6 @@ const WebsiteBuilderDemo = () => {
               </Link>
             </div>
           </Card>
-
-          {/* Prompt Selector */}
-          <div className="flex justify-center gap-2 mt-6">
-            {demoPrompts.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => {
-                  if (index !== currentPromptIndex) {
-                    setCurrentPromptIndex(index);
-                    resetDemo();
-                    setAutoPlay(true);
-                  }
-                }}
-                className={`w-2.5 h-2.5 rounded-full transition-all ${
-                  index === currentPromptIndex 
-                    ? "bg-gradient-to-r from-[#3B82F6] to-[#9333EA] w-8" 
-                    : "bg-[#2D2D2D] hover:bg-[#3D3D3D]"
-                }`}
-              />
-            ))}
-          </div>
         </div>
       </div>
     </section>
