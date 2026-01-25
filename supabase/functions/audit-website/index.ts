@@ -88,24 +88,35 @@ Based on typical best practices and common issues found on websites, generate re
 
 Provide specific, actionable recommendations for improvement.`;
 
-    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'google/gemini-3-flash-preview',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: userPrompt }
-        ],
-      }),
-    });
+    const makeRequest = async () => {
+      return await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'google/gemini-2.5-flash',
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: userPrompt }
+          ],
+        }),
+      });
+    };
+
+    let response = await makeRequest();
+
+    // If rate limited, wait and retry once
+    if (response.status === 429) {
+      console.log('Rate limited, waiting 3 seconds before retry...');
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      response = await makeRequest();
+    }
 
     if (!response.ok) {
       if (response.status === 429) {
-        return new Response(JSON.stringify({ error: 'Rate limit exceeded. Please try again later.' }), {
+        return new Response(JSON.stringify({ error: 'Rate limit exceeded. Please wait a moment and try again.', retry_after: 15 }), {
           status: 429,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
