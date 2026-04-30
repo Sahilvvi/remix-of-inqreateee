@@ -12,11 +12,8 @@ import {
   DollarSign,
   Mic,
   BarChart3,
-  ArrowRight,
   Sparkles
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
 
 const FeaturesGrid = () => {
   const features = [
