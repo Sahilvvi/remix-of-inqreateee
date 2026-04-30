@@ -10,6 +10,7 @@ import WebsiteBuilderDemo from "@/components/landing/WebsiteBuilderDemo";
 import UseCases from "@/components/landing/UseCases";
 import Testimonials from "@/components/landing/Testimonials";
 import Pricing from "@/components/landing/Pricing";
+import BlogPreview from "@/components/landing/BlogPreview";
 import FAQ from "@/components/landing/FAQ";
 import CTASection from "@/components/landing/CTASection";
 import Footer from "@/components/landing/Footer";
@@ -29,6 +30,7 @@ const Landing = () => {
       <UseCases />
       <Testimonials />
       <Pricing />
+      <BlogPreview />
       <FAQ />
       <CTASection />
       <Footer />
