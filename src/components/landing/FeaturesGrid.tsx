@@ -119,7 +119,7 @@ const FeaturesGrid = () => {
   ];
 
   return (
-    <section className="relative py-32 overflow-hidden" id="features">
+    <section className="relative py-20 md:py-24 overflow-hidden" id="features">
       {/* Dynamic gradient background matching Hero */}
       <div className="absolute inset-0 bg-[#0D0D0D]">
         <div className="absolute inset-0 opacity-20">
@@ -143,32 +143,32 @@ const FeaturesGrid = () => {
 
       <div className="container mx-auto px-6 relative z-10">
         {/* Header Section */}
-        <div className="text-center mb-20 animate-fade-in">
-          <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-[#3B82F6]/20 to-[#9333EA]/20 border border-[#3B82F6]/30 backdrop-blur-sm mb-8">
+        <div className="text-center mb-12 animate-fade-in">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-[#3B82F6]/20 to-[#9333EA]/20 border border-[#3B82F6]/30 backdrop-blur-sm mb-5">
             <Sparkles className="w-4 h-4 text-[#3B82F6]" />
-            <span className="text-sm font-medium bg-gradient-to-r from-[#3B82F6] to-[#9333EA] bg-clip-text text-transparent">
+            <span className="text-xs font-medium bg-gradient-to-r from-[#3B82F6] to-[#9333EA] bg-clip-text text-transparent">
               All-in-One Platform
             </span>
           </div>
-          
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
+
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
             <span className="text-white">Everything You Need. </span>
             <span className="bg-gradient-to-r from-[#3B82F6] via-[#9333EA] to-[#EC4899] bg-clip-text text-transparent">
               In One Platform.
             </span>
           </h2>
-          
-          <p className="text-lg md:text-xl text-[#9CA3AF] max-w-3xl mx-auto leading-relaxed">
+
+          <p className="text-sm md:text-base text-[#9CA3AF] max-w-2xl mx-auto leading-relaxed">
             12 powerful features that competitors only offer separately. Blog, Post, Schedule, Analyze — all in one place.
           </p>
         </div>
 
         {/* Features Grid */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 max-w-7xl mx-auto">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4 max-w-6xl mx-auto">
           {features.map((feature, index) => (
             <Card
               key={index}
-              className="group relative bg-[#111111]/80 backdrop-blur-sm border border-white/[0.08] hover:border-white/20 rounded-2xl overflow-hidden transition-all duration-500 hover:shadow-2xl cursor-pointer"
+              className="group relative bg-[#111111]/80 backdrop-blur-sm border border-white/[0.08] hover:border-white/20 rounded-xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5 cursor-pointer"
               style={{ 
                 animationDelay: `${index * 0.05}s`,
               }}
@@ -182,43 +182,35 @@ const FeaturesGrid = () => {
               ></div>
 
               {/* Top gradient line */}
-              <div className={`absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r ${feature.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300`}></div>
+              <div className={`absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r ${feature.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300`}></div>
 
               {/* Badge */}
-              <div className="absolute top-4 right-4 z-10">
-                <span className={`px-3 py-1 text-[10px] font-bold uppercase tracking-wider bg-gradient-to-r ${feature.gradient} text-white rounded-full shadow-lg`}>
+              <div className="absolute top-2.5 right-2.5 z-10">
+                <span className={`px-1.5 py-0.5 text-[8px] font-semibold uppercase tracking-wide bg-gradient-to-r ${feature.gradient} text-white rounded-full shadow`}>
                   {feature.badge}
                 </span>
               </div>
 
-              <CardContent className="p-6 relative z-10">
+              <CardContent className="p-4 relative z-10">
                 {/* Icon with gradient background */}
-                <div className="relative mb-5">
+                <div className="relative mb-3">
                   <div 
-                    className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} rounded-2xl blur-xl opacity-0 group-hover:opacity-40 transition-opacity duration-500`}
+                    className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} rounded-lg blur-md opacity-0 group-hover:opacity-30 transition-opacity duration-500`}
                   ></div>
-                  <div className={`relative w-14 h-14 rounded-2xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-300`}>
-                    <feature.icon className="w-7 h-7 text-white" />
+                  <div className={`relative w-9 h-9 rounded-lg bg-gradient-to-br ${feature.gradient} flex items-center justify-center shadow-md group-hover:scale-105 transition-all duration-300`}>
+                    <feature.icon className="w-4.5 h-4.5 text-white" strokeWidth={2.25} style={{ width: '18px', height: '18px' }} />
                   </div>
                 </div>
 
                 {/* Title */}
-                <h3 className="text-lg font-bold text-white mb-2 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-white/80 group-hover:bg-clip-text transition-all duration-300">
+                <h3 className="text-sm font-semibold text-white mb-1.5 leading-snug">
                   {feature.title}
                 </h3>
 
                 {/* Description */}
-                <p className="text-sm text-[#9CA3AF] leading-relaxed mb-4">
+                <p className="text-xs text-[#9CA3AF] leading-relaxed line-clamp-3">
                   {feature.description}
                 </p>
-
-                {/* Learn more link */}
-                <div className="flex items-center gap-1.5 text-sm font-medium opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
-                  <span className={`bg-gradient-to-r ${feature.gradient} bg-clip-text text-transparent`}>
-                    Learn more
-                  </span>
-                  <ArrowRight className="w-4 h-4 text-[#9CA3AF] group-hover:translate-x-1 transition-transform duration-300" />
-                </div>
               </CardContent>
             </Card>
           ))}
